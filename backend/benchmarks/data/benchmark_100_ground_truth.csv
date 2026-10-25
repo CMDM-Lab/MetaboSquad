@@ -1,0 +1,101 @@
+﻿no.,question,input_file,tokens,total_cost,latency_sec,Is the task successful?,Is the task completed?,expected_intent,expected_pmids,expected_cid,expected_inchikey,expected_axis,expected_colorblind,expected_legend,expected_dpi
+1,你好，請問你能做哪些事項？,,991,0.000682,3.7126,Yes,Yes,direct,,,,,,,
+2,嗨，代謝體研究AI助理，你好！,,842,0.0004364,2.0305,Yes,Yes,direct,,,,,,,
+3,你好請問你能幫我做什麼？,,1017,0.0007188,4.3172,Yes,Yes,direct,,,,,,,
+4,請問你有哪些功能？,,973,0.0006628,4.329,Yes,Yes,direct,,,,,,,
+5,你能幫我生成代謝物的報告嗎？,,924,0.0005652,2.9107,Yes,Yes,direct,,,,,,,
+6,我應該如何開始分析呢？,,847,0.000454,2.5535,Yes,Yes,direct,,,,,,,
+7,你好,,802,0.0004012,2.0119,Yes,Yes,direct,,,,,,,
+8,你可以做資料分析嗎,,918,0.0005748,3.8389,Yes,Yes,direct,,,,,,,
+9,請問你可以做什麼？,,986,0.0006788,4.0823,Yes,Yes,direct,,,,,,,
+10,你好，請問你能做什麼？,,976,0.000658,3.8621,Yes,Yes,direct,,,,,,,
+11,你好，請問你有什麼功能？,,983,0.0006692,3.9225,Yes,Yes,direct,,,,,,,
+12,可以幫我比較兩組代謝體數據的差異嗎？,,974,0.000638,3.5783,Yes,Yes,direct,,,,,,,
+13,請問你能幫我做什麼？,,1019,0.0007244,4.1566,Yes,Yes,direct,,,,,,,
+14,你好，請問你能幫我查詢文獻嗎？,,840,0.000426,2.1368,Yes,Yes,direct,,,,,,,
+15,你好，請問你能幫我搜尋代謝物嗎？,,847,0.0004396,2.3918,Yes,Yes,direct,,,,,,,
+16,請問我應該如何使用？,,991,0.0006844,3.9807,Yes,Yes,direct,,,,,,,
+17,如果我有代謝體的 peak table 我應該如何進行分析？,,1238,0.001058,6.9431,Yes,Yes,direct,,,,,,,
+18,代謝體研究AI助理，請問怎麼開始使用？,,1004,0.0006908,4.9156,Yes,Yes,direct,,,,,,,
+19,你好，請你介紹一下能做什麼？,,1019,0.0007244,4.3489,Yes,Yes,direct,,,,,,,
+20,你好，請問我應該從何開始？,,1013,0.0007124,4.0661,Yes,Yes,direct,,,,,,,
+21,請幫我分析這個 peak table，分組名稱是group，不是配對樣本，樣本是離散,ST004196_untarg_data.csv,1021,0.0005164,16.9999,Yes,Yes,analysis,,,,,,,
+22,我的分組名稱是group，不是配對樣本，樣本是離散，請幫我分析,ST004299_untarg_data.csv,1012,0.0005092,22.1158,Yes,Yes,analysis,,,,,,,
+23,我的分組名稱是group，不是配對樣本，樣本是離散，請幫我分析,ST004302_untarg_data.csv,1012,0.0005092,22.1158,Yes,Yes,analysis,,,,,,,
+24,請幫我分析這個 peak table，分組名稱是group，不是配對樣本，樣本是離散,ST004306_untarg_data.csv,1021,0.0005164,16.9999,Yes,Yes,analysis,,,,,,,
+25,請幫我分析這個 peak table，分組名稱是group，不是配對樣本，樣本是離散,ST004319_untarg_data.csv,1021,0.0005164,16.9999,Yes,Yes,analysis,,,,,,,
+26,我的分組名稱是group，不是配對樣本，樣本是離散，請幫我分析,ST004308_untarg_data.csv,1012,0.0005092,22.1158,Yes,Yes,analysis,,,,,,,
+27,請幫我做分析，分組名稱是Label，不是配對樣本，樣本是離散,C1_pos.csv,1000,0.0004996,20.3782,Yes,Yes,analysis,,,,,,,
+28,請幫我做分析，分組名稱是Label，不是配對樣本，樣本是離散,B1_pos.csv,1000,0.0004996,20.3782,Yes,Yes,analysis,,,,,,,
+29,請幫我分析這個 peak table，分組名稱是Label，不是配對樣本，樣本是離散,malaria_feature_table.csv,1015,0.0005116,32.7213,Yes,Yes,analysis,,,,,,,
+30,請幫我分析這個 peak table，分組名稱是group，不是配對樣本，樣本是離散,ST004266_untarg_data.csv,1021,0.0005164,16.9999,Yes,Yes,analysis,,,,,,,
+31,請幫我分析這個 peak table，分組名稱是group，不是配對樣本，樣本是離散,ST004351_untarg_data.csv,1021,0.0005164,16.9999,Yes,Yes,analysis,,,,,,,
+32,我的分組名稱是group，不是配對樣本，樣本是離散，請幫我分析,ST004479_untarg_data.csv,1012,0.0005092,22.1158,Yes,Yes,analysis,,,,,,,
+33,請幫我做分析，分組名稱是group，不是配對樣本，樣本是離散,ST004197_untarg_data.csv,1012,0.0005092,22.3302,Yes,Yes,analysis,,,,,,,
+34,我的分組名稱是Label，不是配對樣本，樣本是離散，請幫我分析,ST003223_AN005285_Results.csv,1000,0.0004996,13.4431,Yes,Yes,analysis,,,,,,,
+35,我的分組名稱是Label，不是配對樣本，樣本是離散，請幫我分析,lcms_table.csv,1000,0.0004996,13.4431,Yes,Yes,analysis,,,,,,,
+36,請幫我做分析，分組名稱是group，不是配對樣本，樣本是離散,ST004181_untarg_data.csv,1012,0.0005092,22.3302,Yes,Yes,analysis,,,,,,,
+37,我的分組名稱是group，不是配對樣本，樣本是離散，請幫我分析,ST004149_untarg_data.csv,1012,0.0005092,22.1158,Yes,Yes,analysis,,,,,,,
+38,我的分組名稱是group，不是配對樣本，樣本是離散，請幫我分析,ST004386_untarg_data.csv,1012,0.0005092,22.1158,Yes,Yes,analysis,,,,,,,
+39,請幫我做分析，分組名稱是Label，不是配對樣本，樣本是離散,A1_pos.csv,1000,0.0004996,20.3782,Yes,Yes,analysis,,,,,,,
+40,請幫我做分析，分組名稱是group，不是配對樣本，樣本是離散,ST004156_untarg_data.csv,1012,0.0005092,22.3302,Yes,Yes,analysis,,,,,,,
+41,搜尋化合物：alanine,,656,0.0002912,5.0105,Yes,Yes,pubchem,,5950,QNAYBMKLOCPYGJ-REOHCLBHSA-N,,,,
+42,搜尋化合物：oleic acid,,661,0.0002968,4.3182,Yes,Yes,pubchem,,445639,ZQPPMHVWECSIRJ-KTKRTIGZSA-N,,,,
+43,找出 linoleic acid 在 PubChem 上的標識符,,679,0.0003112,5.1399,Yes,Yes,pubchem,,5280450,OYHQOLUKZRVURQ-HZJYTTRNSA-N,,,,
+44,請提供 glucose 的 PubChem CID,,656,0.0002912,4.2938,Yes,Yes,pubchem,,5793,WQZGKKKJIJFFOK-GASJEMHNSA-N,,,,
+45,glutamate 的 CID 是什麼？,,663,0.0002976,4.0749,Yes,Yes,pubchem,,33032,WHUUTDBJXJRKMK-VKHMYHEASA-N,,,,
+46,搜尋化合物：alpha-ketoglutarate,,672,0.0003072,4.5417,Yes,Yes,pubchem,,164533,KPGXRSRHYNQIFN-UHFFFAOYSA-L,,,,
+47,搜尋化合物：acetyl-CoA,,664,0.0002992,4.4306,Yes,Yes,pubchem,,444493,ZSLZBFCDCINBPY-ZSJPKINUSA-N,,,,
+48,請提供 pyruvate 的 PubChem CID,,663,0.0002976,4.1908,Yes,Yes,pubchem,,107735,LCTONWCANYUPML-UHFFFAOYSA-M,,,,
+49,搜尋化合物：tyrosine,,660,0.0002952,4.6731,Yes,Yes,pubchem,,6057,OUYCCCASQSFEME-QMMMGPOBSA-N,,,,
+50,phenylalanine 的 CID 是什麼？,,667,0.0003016,5.5445,Yes,Yes,pubchem,,6140,COLNVLDHVKWLRT-QMMMGPOBSA-N,,,,
+51,幫我查詢代謝物 succinate 的詳細資訊,,674,0.0003056,4.6615,Yes,Yes,pubchem,,160419,KDYFGRWQOYBRFD-UHFFFAOYSA-L,,,,
+52,找出 fumarate 在 PubChem 上的標識符,,672,0.0003048,4.2237,Yes,Yes,pubchem,,5460307,VZCYOOQTPOCHFL-OWOJBTEDSA-L,,,,
+53,搜尋化合物：oxaloacetate,,664,0.0002992,3.7931,Yes,Yes,pubchem,,970,KHPXUQMNIQBQEV-UHFFFAOYSA-N,,,,
+54,幫我查詢代謝物 cholesterol 的詳細資訊,,671,0.0003032,5.131,Yes,Yes,pubchem,,5997,HVYWMOMLDIMFJA-DPAQBDIFSA-N,,,,
+55,找出 tryptophan 在 PubChem 上的標識符,,679,0.0003112,4.5214,Yes,Yes,pubchem,,6305,QIVBCDIJIAJPQS-VIFPVBQESA-N,,,,
+56,查 stearic acid,,661,0.0002968,5.2071,Yes,Yes,pubchem,,5281,QIQXTHQIDYTFRH-UHFFFAOYSA-N,,,,
+57,查 palmitic acid,,658,0.0002944,6.9877,Yes,Yes,pubchem,,985,IPCSVZSSVZVIGE-UHFFFAOYSA-N,,,,
+58,查 malate,,653,0.0002888,4.0803,Yes,Yes,pubchem,,525,BJEPYKJPYRNKOW-UHFFFAOYSA-N,,,,
+59,查 glutamine,,654,0.0002904,4.5754,Yes,Yes,pubchem,,5961,ZDXPYRJPNDTMRX-VKHMYHEASA-N,,,,
+60,查 lactate,,654,0.0002904,4.1518,Yes,Yes,pubchem,,91435,JVTAAEKCZFNVCJ-UHFFFAOYSA-M,,,,
+61,Do cytokine concentrations in pancreatic juice predict the presence of pancreatic diseases?,,1286082,1.0334664,807.798,Yes,Yes,literature,16713745,,,,,,
+62,Is serum total bilirubin useful to differentiate cardioembolic stroke from other stroke subtypes?,,5566,0.00337,20.7411,Yes,Yes,literature,25891436,,,,,,
+63,Are Biochemical Markers of Bone Turnover Representative of Bone Histomorphometry in 370 Postmenopausal Women?,,190749,0.1474164,169.8846,Yes,Yes,literature,26505821,,,,,,
+64,Does base deficit predict mortality in patients with severe traumatic brain injury?,,63403,0.0470164,83.0262,Yes,Yes,literature,26079501,,,,,,
+65,Differentiation of nonalcoholic from alcoholic steatohepatitis: are routine laboratory markers useful?,,958911,0.7081836,961.1882,Yes,Yes,literature,18239988,,,,,,
+66,Does early discharge with nurse home visits affect adequacy of newborn metabolic screening?,,5491,0.0032644,41.5374,Yes,Yes,literature,12970636,,,,,,
+67,Is the urinary biomarkers assessment a non-invasive approach to tubular lesions of the solitary kidney?,,27658,0.0168088,51.11,Yes,Yes,literature,23992109,,,,,,
+68,May mean platelet volume levels be a predictor in the diagnosis of pelvic inflammatory disease?,,4161,0.002532,18.7312,Yes,Yes,literature,24958650,,,,,,
+69,Should serum pancreatic lipase replace serum amylase as a biomarker of acute pancreatitis?,,739194,0.5691324,502.25,Yes,Yes,literature,15943725,,,,,,
+70,Is cytokeratin immunoreactivity useful in the diagnosis of short-segment Barrett's oesophagus in Korea?,,3870,0.002214,15.37,Yes,Yes,literature,15879722,,,,,,
+71,Is high-sensitivity C-reactive protein associated with carotid atherosclerosis in healthy Koreans?,,26359,0.0151564,66.6283,Yes,Yes,literature,16319544,,,,,,
+72,Is non-HDL-cholesterol a better predictor of long-term outcome in patients after acute myocardial infarction compared to LDL-cholesterol?,,151063,0.1117744,145.61,Yes,Yes,literature,28056802,,,,,,
+73,Is the fibronectin-aggrecan complex present in cervical disk disease?,,11026,0.0087292,74.3727,Yes,Yes,literature,22108230,,,,,,
+74,The Omega-3 Index: a new risk factor for death from coronary heart disease?,,591309,0.381528,275.9026,Yes,Yes,literature,15208005,,,,,,
+75,Risk factors for avascular necrosis of bone in patients with systemic lupus erythematosus: is there a role for antiphospholipid antibodies?,,32894,0.0223148,75.427,Yes,Yes,literature,10834864,,,,,,
+76,Is it appropriate to implant kidneys from elderly donors in young recipients?,,674583,0.4910844,367.0669,Yes,Yes,literature,20571467,,,,,,
+77,Are behavioural risk factors to be blamed for the conversion from optimal blood pressure to hypertensive status in Black South Africans?,,2124464,1.3762268,1022.82,Yes,Yes,literature,22825590,,,,,,
+78,"Do lipids, blood pressure, diabetes, and smoking confer equal risk of myocardial infarction in women as in men?",,1243141,0.7823008,605.9,Yes,Yes,literature,12006913,,,,,,
+79,Is the Hawkins sign able to predict necrosis in fractures of the neck of the astragalus?,,12073,0.0075556,48.5364,Yes,Yes,literature,24183388,,,,,,
+80,Acute respiratory distress syndrome in children with malignancy--can we predict outcome?,,280561,0.2026228,181.4323,Yes,Yes,literature,11481599,,,,,,
+81,請檢查這張圖適不適合學術發表,benchmark_combined_pca_01.png,4595,0.0023264,40.902,Yes,Yes,,,,,PASS,PASS,PASS,PASS
+82,請檢查這張圖適不適合學術發表,benchmark_combined_pca_02.png,2239,0.0013696,12.144,Yes,Yes,,,,,FAIL,FAIL,FAIL,FAIL
+83,請檢查這張圖適不適合學術發表,benchmark_combined_pca_03.png,4278,0.0021588,36.158,Yes,Yes,,,,,PASS,FAIL,PASS,PASS
+84,請檢查這張圖適不適合學術發表,benchmark_combined_pca_04.png,2244,0.0013464,21.91,Yes,Yes,,,,,FAIL,PASS,FAIL,FAIL
+85,請檢查這張圖適不適合學術發表,benchmark_combined_volcano_05.png,4004,0.0021608,29.584,Yes,Yes,,,,,PASS,PASS,PASS,PASS
+86,請檢查這張圖適不適合學術發表,benchmark_combined_volcano_06.png,2564,0.0015476,15.576,No,Yes,,,,,FAIL,FAIL,FAIL,FAIL
+87,請檢查這張圖適不適合學術發表,benchmark_combined_volcano_07.png,2657,0.0016088,15.525,Yes,Yes,,,,,PASS,FAIL,FAIL,FAIL
+88,請檢查這張圖適不適合學術發表,benchmark_combined_volcano_08.png,4336,0.0022276,34.064,Yes,Yes,,,,,FAIL,PASS,PASS,PASS
+89,請檢查這張圖適不適合學術發表,benchmark_combined_heatmap_09.png,3166,0.0017116,22.397,Yes,Yes,,,,,PASS,PASS,PASS,PASS
+90,請檢查這張圖適不適合學術發表,benchmark_combined_heatmap_10.png,2201,0.0013712,11.401,Yes,Yes,,,,,FAIL,FAIL,PASS,FAIL
+91,請檢查這張圖適不適合學術發表,benchmark_combined_heatmap_11.png,2760,0.0016392,19.077,Yes,Yes,,,,,FAIL,FAIL,PASS,FAIL
+92,請檢查這張圖適不適合學術發表,benchmark_combined_heatmap_12.png,3399,0.0018276,23.09,Yes,Yes,,,,,FAIL,PASS,PASS,PASS
+93,請檢查這張圖適不適合學術發表,benchmark_combined_boxplot_13.png,3458,0.0018896,25.082,Yes,Yes,,,,,PASS,PASS,PASS,PASS
+94,請檢查這張圖適不適合學術發表,benchmark_combined_boxplot_14.png,2238,0.001368,11.642,Yes,Yes,,,,,FAIL,FAIL,FAIL,FAIL
+95,請檢查這張圖適不適合學術發表,benchmark_combined_boxplot_15.png,3584,0.0019436,24.991,Yes,Yes,,,,,PASS,FAIL,FAIL,PASS
+96,請檢查這張圖適不適合學術發表,benchmark_combined_boxplot_16.png,2526,0.0014748,15.646,Yes,Yes,,,,,FAIL,PASS,PASS,FAIL
+97,請檢查這張圖適不適合學術發表,benchmark_combined_bar_error_17.png,4686,0.002436,40.976,Yes,Yes,,,,,PASS,PASS,PASS,PASS
+98,請檢查這張圖適不適合學術發表,benchmark_combined_bar_error_18.png,2290,0.0014512,13.341,Yes,Yes,,,,,FAIL,FAIL,FAIL,FAIL
+99,請檢查這張圖適不適合學術發表,benchmark_combined_bar_error_19.png,3275,0.0018224,23.619,Yes,Yes,,,,,PASS,PASS,FAIL,PASS
+100,請檢查這張圖適不適合學術發表,benchmark_combined_bar_error_20.png,4312,0.0022888,33.55,Yes,Yes,,,,,FAIL,FAIL,PASS,PASS

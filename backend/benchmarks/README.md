@@ -6,8 +6,10 @@ estimation that general-purpose MLLMs do not reliably provide).
 
 Scope is deliberately narrow: this covers the **50-figure boundary benchmark**,
 the **50-figure semantic-compliance benchmark**, and the **cross-model
-comparison**. It does not cover the 100-query five-task benchmark — that one
-backs the integration claim, which the manuscript does not lead with.
+comparison**. The harness does not run the 100-query five-task benchmark —
+that one backs the integration claim, which the manuscript does not lead with.
+Its question set and recorded results are kept as data; see
+[100-query five-task benchmark](#100-query-five-task-benchmark-data-only) below.
 
 ## Why this exists
 
@@ -193,3 +195,30 @@ Both properties are pinned by tests
 `test_nominal_line_widths_follow_the_generator_sequence`), so a regeneration
 that changes the parameter grid will fail here rather than quietly shifting the
 published numbers.
+
+---
+
+## 100-query five-task benchmark: data only
+
+`data/benchmark_100_ground_truth.csv` (UTF-8 with BOM, 100 rows) is the question
+set behind manuscript Tables S1 and S10, with the result recorded for each
+query. There is no runner for it in this directory.
+
+| Rows | Task | Expected-answer columns |
+| :--- | :--- | :--- |
+| 1–20 | `direct` (greetings, capability questions) | `expected_intent` |
+| 21–40 | `analysis` (peak-table analysis) | `expected_intent`; `input_file` names the peak table |
+| 41–60 | `pubchem` (ID mapping) | `expected_cid`, `expected_inchikey` |
+| 61–80 | `literature` (PubMedQA-style questions) | `expected_pmids` |
+| 81–100 | plot review | `expected_axis`, `expected_colorblind`, `expected_legend`, `expected_dpi` (`PASS`/`FAIL`) |
+
+`expected_intent` is empty for rows 81–100. Recorded results per row:
+`tokens`, `total_cost`, `latency_sec`, `Is the task successful?`,
+`Is the task completed?`. Questions are kept verbatim, most of them in Chinese.
+
+The input files are **not** in this repository. Most analysis inputs are public
+Metabolomics Workbench studies (`ST00xxxx_*`); `lcms_table.csv` is the
+MetaboAnalyst example bundled in `backend/uploads/csv/`. The 20 plot-review
+figures (`benchmark_combined_*.png`) are a separate set from the two 50-figure
+benchmarks above, and they only have binary labels, so they cannot reproduce
+the continuous font-size and line-width metrics.
