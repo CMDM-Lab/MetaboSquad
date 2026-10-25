@@ -1,0 +1,425 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Design tokens — the clinical palette.
+   Flat design throughout: every radius is 0, elevation is a 1px rule, and
+   there is no dark mode — `--radius-*` are kept only as documented tokens.
+   `color-scheme: light` tells the browser not to auto-darken native form
+   control chrome (checkboxes, `<select>` popups, scrollbars) when the OS is
+   set to dark mode — without it, `color-scheme` computes to `normal` and
+   native widgets can pick up dark chrome while every custom colour on this
+   page stays fixed to the light palette, producing a mismatched look the
+   "no dark mode" rule does not intend.
+   ========================================================================== */
+:root {
+  color-scheme: light;
+
+  /* semantic tokens */
+  --bg: #f7f7f5;
+  --surface: #eeeeec;
+  --text: #16181a;
+  --accent: #8c1d2f;
+  --divider: #d8dad6;
+
+  /* accent ramp */
+  --accent-100: #f6e8ea;
+  --accent-200: #eccfd3;
+  --accent-300: #dba7ae;
+  --accent-400: #c47c86;
+  --accent-500: #a8404f;
+  --accent-600: #8c1d2f;
+  --accent-700: #7a1926;
+  --accent-800: #5e1420;
+  --accent-900: #3f0d16;
+
+  /* neutral ramp */
+  --neutral-100: #f2f2f0;
+  --neutral-200: #e6e7e4;
+  --neutral-300: #d8dad6;
+  --neutral-400: #b9bdb8;
+  --neutral-500: #8b9199;
+  --neutral-600: #6b7280;
+  --neutral-700: #3f4a56;
+  --neutral-800: #2a3038;
+  --neutral-900: #16181a;
+
+  /* spacing scale, px */
+  --space-1: 4.6px;
+  --space-2: 9.2px;
+  --space-3: 13.8px;
+  --space-4: 18.4px;
+  --space-6: 27.6px;
+  --space-8: 36.8px;
+
+  /* flat design: every radius is 0 */
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-text: var(--text);
+  --color-accent: var(--accent);
+  --color-divider: var(--divider);
+
+  --color-accent-100: var(--accent-100);
+  --color-accent-200: var(--accent-200);
+  --color-accent-300: var(--accent-300);
+  --color-accent-400: var(--accent-400);
+  --color-accent-500: var(--accent-500);
+  --color-accent-600: var(--accent-600);
+  --color-accent-700: var(--accent-700);
+  --color-accent-800: var(--accent-800);
+  --color-accent-900: var(--accent-900);
+
+  --color-neutral-100: var(--neutral-100);
+  --color-neutral-200: var(--neutral-200);
+  --color-neutral-300: var(--neutral-300);
+  --color-neutral-400: var(--neutral-400);
+  --color-neutral-500: var(--neutral-500);
+  --color-neutral-600: var(--neutral-600);
+  --color-neutral-700: var(--neutral-700);
+  --color-neutral-800: var(--neutral-800);
+  --color-neutral-900: var(--neutral-900);
+
+  /* --font-plex-sans / --font-plex-mono / --font-noto-tc are the CSS
+     variables next/font attaches via className in layout.tsx. Noto Sans TC
+     is the CJK fallback for both stacks (there is no separate mono CJK face
+     in this design). */
+  --font-sans: var(--font-plex-sans), var(--font-noto-tc), sans-serif;
+  --font-mono: var(--font-plex-mono), var(--font-noto-tc), monospace;
+}
+
+/* Every plain element/utility rule that could compete with a
+   `@layer components` class for the same element lives inside `@layer base`.
+   The bug class this closes: CSS cascade layers rank *every* unlayered
+   declaration above *every* layered one, regardless of selector
+   specificity, so a bare top-level rule permanently wins over a class
+   selector declared inside a layer, even where specificity alone would say
+   otherwise. That is exactly how the `a { color }` bug below happened — and
+   any other bare rule left at the top level (`body`, `h1..h4`, `figcaption`,
+   the `button,input,select,textarea` reset, `:focus`, `:focus-visible`,
+   `::selection`) was an equally live instance of the same class of bug,
+   whether or not it happened to collide with a component class *today*. The
+   structural invariant this is meant to guarantee — "no rule in this file
+   sits outside an @layer block" — is asserted directly in
+   `src/__tests__/design-tokens.test.ts`'s "CSS cascade layers" block, so a
+   future rule added back at the top level fails that test rather than
+   waiting to be found by hand in a browser again. `:root` and `@theme` are
+   the two deliberate exceptions: they only ever declare custom properties /
+   build-time design tokens, never a property that competes against a
+   `.btn`/`.input`/`.table`/`.tag`/`.hr`/`.field` declaration for the same
+   element, so leaving them at the top level (the idiomatic Tailwind v4
+   layout) cannot reproduce this bug regardless of layer. */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: 13px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+  h1 { font-size: 30px; }
+  h2 { font-size: 24px; }
+  h3 { font-size: 19px; }
+  h4 { font-size: 16px; }
+
+  /* Found live in the browser: a `<Link className="btn btn-primary">` (the
+     home page's About link) rendered with `color: #8c1d2f` on a
+     `background: #8c1d2f` fill — text and background the same colour,
+     completely unreadable — while the equivalent
+     `<button class="btn btn-primary">` on the same page rendered correctly,
+     because button text has no competing unlayered element-selector rule.
+     Moving `a`/`a:hover` here (Tailwind's own layer for exactly this kind of
+     reset, ranked below `@layer components`) lets `.btn-primary` and
+     `.btn-secondary` win as their higher-specificity class selector
+     should. */
+  a {
+    color: #8c1d2f;
+  }
+  a:hover {
+    color: #5e1420;
+  }
+
+  figcaption {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--color-neutral-600);
+  }
+
+  /* Form controls don't inherit the page font in every browser by default. */
+  button, input, select, textarea {
+    font-family: inherit;
+  }
+
+  :focus {
+    outline: none;
+  }
+  :focus-visible {
+    outline: 2px solid #8c1d2f;
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  }
+}
+
+/* ==========================================================================
+   Components — a small set of classical component classes, retuned for the
+   clinical palette.
+   ========================================================================== */
+@layer components {
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    /* `text-decoration: none` matters because `.btn` is applied to a
+       Next.js `Link` (an `<a>`, e.g. the home page's About link), and
+       Tailwind's Preflight does not strip the default anchor underline, so
+       such links would otherwise render as underlined "buttons".
+       `border: 1px solid transparent` supplies the width+style half of the
+       border shorthand that `.btn-primary` below only ever supplies the
+       color for — invisible in the default state (border-color already
+       equals the fill), but it is what makes that border visible (a hairline
+       in the original fill color against the hover/active fill) once
+       `:hover`/`:active` change the background underneath it. */
+    text-decoration: none;
+    line-height: 1.2;
+    color: var(--color-text);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 0;
+    white-space: nowrap;
+    font-weight: 500;
+    font-size: 12px;
+    padding: var(--space-2) calc(var(--space-3) * 1.2);
+  }
+  /* `.btn svg` is currently inert (no `.btn`-classed element in this app
+     renders an `<svg>` child); it is kept so a future consumer does not
+     silently regress, the same reasoning applied to `.table`'s base
+     `font-size`. `.btn:disabled` is not inert: the send button while
+     streaming (`Composer.tsx`) renders `<button disabled>` with no Tailwind
+     `disabled:` utility at all, so without this rule it would have no visual
+     disabled state whatsoever — full opacity, default cursor,
+     indistinguishable from an enabled button. Buttons that carry their own
+     `disabled:opacity-*` utility class (e.g. ZipDownloadBox) win over this
+     rule's opacity regardless (Tailwind's `utilities` layer ranks above
+     `components`) — but none of them set `disabled:cursor-not-allowed`, so
+     `cursor: not-allowed` is a real, additive fix for them too. */
+  .btn svg {
+    display: block;
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background: #8c1d2f;
+    color: #fff;
+    border-color: #8c1d2f;
+  }
+  .btn-primary:hover {
+    background: #7a1926;
+    color: #fff;
+  }
+  .btn-primary:active {
+    background: #5e1420;
+    color: #fff;
+  }
+
+  .btn-secondary {
+    background: #eeeeec;
+    border: 1px solid #d8dad6;
+  }
+  /* Without these, a secondary button (Rename/Delete icon buttons, Retry)
+     has no hover or active feedback at all. */
+  .btn-secondary:hover {
+    background: color-mix(in srgb, var(--color-text) 7%, transparent);
+  }
+  .btn-secondary:active {
+    background: color-mix(in srgb, var(--color-text) 14%, transparent);
+  }
+
+  .btn-ghost {
+    background: transparent;
+    border: none;
+    color: var(--color-accent);
+    padding-inline: var(--space-1);
+  }
+  /* Hover/active feedback for the ghost button, same reasoning as
+     `.btn-secondary` above. */
+  .btn-ghost:hover {
+    background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  }
+  .btn-ghost:active {
+    background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  }
+
+  .btn-block {
+    width: 100%;
+    margin-top: var(--space-2);
+  }
+
+  .input {
+    /* `font: inherit`: nothing else in this file sets `.input`/
+       `textarea.input`'s `line-height` or `font-weight`, so without it these
+       fields fall back to the browser's UA default line height instead of
+       inheriting the page's 1.55 — a real, if subtle, difference for
+       `textarea.input` specifically (single-line `<input>` text rendering is
+       largely unaffected by `line-height`, but multi-line boxes are).
+       `font-size` is set after it, so it still overrides just the size
+       component. `font-size: 13px` matches this app's body-copy convention:
+       an input larger than its own label reads as an accident, and the one
+       place this design wants a visibly bigger field (the home console)
+       already sets `17px` explicitly rather than relying on `.input`'s base
+       size. There is deliberately no `outline-offset` override on
+       `:focus-visible`: the design uses a uniform `outline-offset: 2px`
+       focus ring on every interactive element project-wide, and a per-input
+       override back to 0 would break that. */
+    font: inherit;
+    width: 100%;
+    border-radius: 0;
+    min-height: 36px;
+    border: 1px solid var(--color-divider);
+    background: #fff;
+    padding: 0 var(--space-2);
+    font-size: 13px;
+    caret-color: var(--color-accent);
+  }
+  .input:hover {
+    border-color: color-mix(in srgb, var(--color-text) 45%, transparent);
+  }
+  .input:focus-visible {
+    border-color: var(--color-accent);
+  }
+  textarea.input {
+    min-height: 90px;
+    resize: vertical;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    /* The `th`/`td` rules below declare their own explicit sizes, so this
+       base value does not affect them. It is kept so a future `<caption>`
+       or other descendant does not silently render at the browser's default
+       size. */
+    font-size: 14px;
+  }
+  .table th {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    text-align: left;
+    /* Without cell padding on both th and td, adjacent narrow columns (e.g.
+       an em-dash placeholder) render with no gap between them at all —
+       found while building the first real `.table` consumer in
+       modules/results/AnalysisHighlights.tsx. */
+    padding: var(--space-2);
+    /* Deliberately `--color-text`, not `--color-divider`: the design uses a
+       two-tier hairline system (`#16181a` for "section closers", the
+       divider hairline everywhere else), and the header row is the boundary
+       between the table's header and body sections. */
+    border-bottom: 1px solid var(--color-text);
+  }
+  .table td {
+    font-size: 12.5px;
+    padding: var(--space-2);
+    /* Raw hex for neutral-200 (`#e6e7e4`), one step lighter than the
+       `--color-divider` hairline (neutral-300), so body rows read lighter
+       than the header rule. Same deliberate hex choice as `.tag-neutral`
+       below. */
+    border-bottom: 1px solid #e6e7e4;
+  }
+  .table tbody tr:hover {
+    /* A very light warm-grey wash, from the neutral ramp. */
+    background: var(--color-neutral-100);
+  }
+
+  .tag {
+    display: inline-block;
+    border-radius: 0;
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 2px 6px;
+  }
+  /* `.tag-accent` and `.tag-outline` currently have no consumer in this app.
+     They are kept as part of the component set rather than removed.
+     `.tag-accent` is a light tint, not a solid accent fill: solid large
+     accent fills are reserved for a short list of uses, and a status tag is
+     not one of them. Note that `plot_review` deliberately renders no
+     severity tags at all: `review_result` only carries free-text
+     `feedback`, no severity field, and inferring one by regex would
+     mislabel a suggestion as must-fix — worse than no tag. */
+  .tag-accent {
+    background: var(--color-accent-100);
+    color: var(--color-accent-800);
+  }
+  .tag-neutral {
+    background: #e6e7e4;
+    color: #3f4a56;
+  }
+  .tag-outline {
+    background: transparent;
+    border: 1px solid var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .hr {
+    height: 1px;
+    border: 0;
+    margin: var(--space-4) 0;
+    background: var(--color-divider);
+  }
+  .hr-ink {
+    background: #16181a;
+    opacity: 0.85;
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .field label {
+    font-size: 12px;
+    color: var(--color-neutral-700);
+  }
+
+  /* Agent trace's live pulse dot — the physician's signal that the system
+     has not died mid-analysis. Size, radius and colour are plain Tailwind
+     utilities (`h-[7px] w-[7px] rounded-full bg-accent-600`) on the element
+     itself; only the keyframe animation lives here. */
+  .trace-pulse {
+    animation: mmPulse 1.4s ease-in-out infinite;
+  }
+
+  @keyframes mmPulse {
+    0%, 100% {
+      opacity: 0.25;
+      transform: scale(0.8);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.25);
+    }
+  }
+}

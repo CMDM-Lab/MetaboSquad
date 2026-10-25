@@ -1,0 +1,62 @@
+# ── Python ──────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+.venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── Node / Next.js ──────────────────────────────────────────────────────
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Environment variables (.env.sample and .env.example stay tracked) ──────
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# Short-lived working directories of the R container. run_r_code in `use_tool/code.py`
+# creates temp_<uuid>/ under backend/ and the rmtree in its finally block removes it,
+# but it exists while an analysis runs, and a `git add -A` at that moment would
+# commit the .qs/.png/script.R files with it.
+backend/temp_*/
+
+# ── Agent output (everything under uploads is ignored; only 2 demo files are allowlisted) ──
+# An allowlist is used because listing paths one by one misses some: the list once had only
+# output/, csv/* and image/*, but plot_review also creates uploads/colorblind/ for colorblind
+# simulation images, which was not covered, so a `git add -A` committed 8 generated images
+# (this happened on 2026-08-04). Any new subdirectory an agent creates is now ignored by default.
+# Guarded by tests/test_gitignore_covers_agent_output.py.
+backend/uploads/*
+!backend/uploads/csv/
+backend/uploads/csv/*
+!backend/uploads/csv/lcms_table.csv
+!backend/uploads/image/
+backend/uploads/image/*
+!backend/uploads/image/benchmark_semantic_pca_01.png
+
+# ── Subagent-driven development scratch workspace ───────────────────────
+.superpowers/
+
+# ── Editors and operating systems ──────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+.gstack/
+
+# Design handoff bundles: the extracted directory is tracked, the archive is not.
+docs/*handoff*.zip
+
+# Pathway gene sets are generated locally, not distributed (provider terms of
+# use). See backend/src/graph_agent/database/README.md.
+backend/src/graph_agent/database/*.gmt
