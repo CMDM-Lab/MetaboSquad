@@ -661,7 +661,9 @@ def _plot_topology_volcano_bubble(csv: str, output_dir: str = "ora_output", top_
 # plot_topology_volcano_bubble("ora_output/topology_pathway_results.csv")
 
 
-GMT = "backend/src/graph_agent/database/kegg_metabolites_hsa.gmt"
+# Resolved from this file, not the working directory: the backend is started
+# from `backend/`, where the old repo-root-relative string did not exist.
+GMT = str(Path(__file__).resolve().parent.parent / "database" / "kegg_metabolites_hsa.gmt")
 @tool
 def run_ora_analysis(
     significant_ids: list,
