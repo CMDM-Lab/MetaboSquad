@@ -25,15 +25,57 @@ not reportable.
 
 ## What still has to be filled in
 
-### 1. `data/figures/` — the figure set
+### 1. `data/figures/` — the figure set: generators committed
 
-The images themselves. The thesis describes five chart types (PCA score,
-volcano, heatmap, box, bar) with three compliance criteria toggled
-independently. If they were generated programmatically, **commit the generator
-instead of the PNGs** — that is strictly better, because it also pins how the
-ground truth was derived.
+The figures were generated programmatically, and the generators supplied by
+the author are in `generators/`. Each one writes the PNGs and a ground-truth
+JSON, and the ground truth is the parameters the figure was drawn with.
+
+| Generator | Figures | Ground-truth file | Manuscript |
+| :--- | :--- | :--- | :--- |
+| `build_plot.py` | 50 `benchmark_<type>_NN.png` (boundary: DPI, font, line width) | `benchmark_gt.json` | Tables S5, S7, S8 |
+| `build_plot_50.py` | 50 `benchmark_semantic_<type>_NN.png` (axis, colorblind, legend) | `benchmark_semantic_gt.json` | Tables S6, S9 |
+| `build_plot_20.py` | 20 `benchmark_combined_<type>_NN.png` (all six criteria) | `benchmark_combined_gt.json` | 100-query benchmark, rows 81–100 |
+
+```bash
+cd backend
+venv/bin/python -m benchmarks.generators.build_plot      # -> uploads/image/benchmark_new_new/
+venv/bin/python -m benchmarks.generators.build_plot_50   # -> uploads/image/benchmark_semantic_update/
+venv/bin/python -m benchmarks.generators.build_plot_20   # -> uploads/image/benchmark_combined_20_new/
+```
+
+Provenance: the scripts came from the author's handover material. Comments
+and printed text were translated to English, and directory creation moved
+from import time into `main()`. Drawing code and parameters are unchanged:
+the original and the committed scripts produce 120 byte-identical PNGs with
+matplotlib 3.11.1.
+
+`test_generators.py` pins the generators to the recorded data:
+
+- `build_plot.py` reproduces the nominal DPI, font size and line width of all
+  50 rows of `data/table12_13_measurements.csv`.
+- `build_plot_20.py` agrees with the expected verdicts in
+  `data/benchmark_100_ground_truth.csv` except in **2 cells**, which are not
+  resolved yet:
+
+  | Figure | Criterion | Generator | CSV |
+  | :--- | :--- | :--- | :--- |
+  | `benchmark_combined_volcano_07.png` | colorblind | PASS | FAIL |
+  | `benchmark_combined_heatmap_11.png` | axis | PASS | FAIL |
+
+  The author has to confirm which value the manuscript scored against. The
+  test lists both cells exactly, so a correction or any new drift fails.
+
+The semantic benchmark has no recorded per-figure verdicts in this repository,
+so `build_plot_50.py` is checked only for its own structure (every criterion
+has both verdicts, the heatmap legend is always PASS).
 
 ### 2. `data/ground_truth.jsonl` — one record per figure
+
+⚠️ Not written yet. `figure_bench.py` reads this file, and the generators
+write a different format (`benchmark_gt.json` keyed by file name, with
+`expected_*` fields). A conversion from the generator output to the schema
+below is still missing.
 
 ```json
 {
@@ -176,7 +218,7 @@ nominal 2.0, median 2.06, estimated 6.25, and the thesis value is 0.06. Using
 **pca, volcano and boxplot share their line-width measurements**, figure for
 figure. This was first read as a copy-paste defect. It is not.
 
-`build_plot.py` generates all 50 figures as `PLOT_TYPES × PARAM_COMBOS`, and
+`generators/build_plot.py` generates all 50 figures as `PLOT_TYPES × PARAM_COMBOS`, and
 every chart type gets the same line width sequence — 3, 1, 2, 1.5, 2.5, 2.5,
 1.5, 1, 3, 2 — drawn from a single `line_pt` variable. The three line-dominated
 types therefore measure alike. heatmap (colour fills) and bar_error (filled
@@ -221,4 +263,10 @@ Metabolomics Workbench studies (`ST00xxxx_*`); `lcms_table.csv` is the
 MetaboAnalyst example bundled in `backend/uploads/csv/`. The 20 plot-review
 figures (`benchmark_combined_*.png`) are a separate set from the two 50-figure
 benchmarks above, and they only have binary labels, so they cannot reproduce
-the continuous font-size and line-width metrics.
+the continuous font-size and line-width metrics. `generators/build_plot_20.py`
+regenerates them (2 cells disagree with this CSV, see above).
+
+The 20 analysis queries (rows 21–40) use peak tables whose features have no
+metabolite names (m/z and retention time only). Pathway analysis (ORA and
+GSEA) needs named metabolites, so it was skipped for all 20 queries, and the
+recorded results do not include it. Confirmed by the author on 2026-10-27.
