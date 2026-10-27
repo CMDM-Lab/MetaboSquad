@@ -266,7 +266,13 @@ benchmarks above, and they only have binary labels, so they cannot reproduce
 the continuous font-size and line-width metrics. `generators/build_plot_20.py`
 regenerates them (2 cells disagree with this CSV, see above).
 
-The 20 analysis queries (rows 21–40) use peak tables whose features have no
-metabolite names (m/z and retention time only). Pathway analysis (ORA and
-GSEA) needs named metabolites, so it was skipped for all 20 queries, and the
-recorded results do not include it. Confirmed by the author on 2026-10-27.
+Pathway analysis (ORA and GSEA) maps metabolite names to KEGG IDs. If the
+significant features are m/z values (feature names made only of m/z and
+retention-time numbers, e.g. `327.2/3418`) instead of metabolite names, the
+system skips pathway analysis. This is expected behaviour, not a failure: the
+report states `Automatically skip ORA and GSEA analysis`, and the task
+continues. A failure reads `⚠️ Pathway analysis failed` instead.
+
+The 20 analysis queries (rows 21–40) all use peak tables with m/z features
+only, so pathway analysis was skipped for each of them, and the recorded
+results do not include it. Confirmed by the author on 2026-10-27.
