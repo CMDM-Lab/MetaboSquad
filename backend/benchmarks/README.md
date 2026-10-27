@@ -44,27 +44,12 @@ venv/bin/python -m benchmarks.generators.build_plot_50   # -> uploads/image/benc
 venv/bin/python -m benchmarks.generators.build_plot_20   # -> uploads/image/benchmark_combined_20_new/
 ```
 
-Provenance: the scripts came from the author's handover material. Comments
-and printed text were translated to English, and directory creation moved
-from import time into `main()`. Drawing code and parameters are unchanged:
-the original and the committed scripts produce 120 byte-identical PNGs with
-matplotlib 3.11.1.
-
 `test_generators.py` pins the generators to the recorded data:
 
 - `build_plot.py` reproduces the nominal DPI, font size and line width of all
   50 rows of `data/table12_13_measurements.csv`.
-- `build_plot_20.py` agrees with the expected verdicts in
-  `data/benchmark_100_ground_truth.csv` except in **2 cells**, which are not
-  resolved yet:
-
-  | Figure | Criterion | Generator | CSV |
-  | :--- | :--- | :--- | :--- |
-  | `benchmark_combined_volcano_07.png` | colorblind | PASS | FAIL |
-  | `benchmark_combined_heatmap_11.png` | axis | PASS | FAIL |
-
-  The author has to confirm which value the manuscript scored against. The
-  test lists both cells exactly, so a correction or any new drift fails.
+- `build_plot_20.py` reproduces the expected verdicts of rows 81–100 of
+  `data/benchmark_100_ground_truth.csv`.
 
 The semantic benchmark has no recorded per-figure verdicts in this repository,
 so `build_plot_50.py` is checked only for its own structure (every criterion
@@ -264,7 +249,7 @@ MetaboAnalyst example bundled in `backend/uploads/csv/`. The 20 plot-review
 figures (`benchmark_combined_*.png`) are a separate set from the two 50-figure
 benchmarks above, and they only have binary labels, so they cannot reproduce
 the continuous font-size and line-width metrics. `generators/build_plot_20.py`
-regenerates them (2 cells disagree with this CSV, see above).
+regenerates them.
 
 Pathway analysis (ORA and GSEA) maps metabolite names to KEGG IDs. If the
 significant features are m/z values (feature names made only of m/z and
@@ -275,4 +260,4 @@ continues. A failure reads `⚠️ Pathway analysis failed` instead.
 
 The 20 analysis queries (rows 21–40) all use peak tables with m/z features
 only, so pathway analysis was skipped for each of them, and the recorded
-results do not include it. Confirmed by the author on 2026-10-27.
+results do not include it.

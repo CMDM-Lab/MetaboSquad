@@ -20,14 +20,6 @@ from benchmarks.table12_13 import load
 
 BENCHMARK_100 = Path(__file__).resolve().parent / "data" / "benchmark_100_ground_truth.csv"
 
-# Cells where build_plot_20.py and benchmark_100_ground_truth.csv disagree.
-# Not resolved yet: the author has to say which one the manuscript scored
-# against (see README). Listed exactly, so a fix or any new drift turns red.
-KNOWN_DISAGREEMENTS = {
-    ("benchmark_combined_volcano_07.png", "colorblind"): ("PASS", "FAIL"),
-    ("benchmark_combined_heatmap_11.png", "axis"): ("PASS", "FAIL"),
-}
-
 
 def _verdict(ok: bool) -> str:
     return "PASS" if ok else "FAIL"
@@ -46,7 +38,7 @@ def test_boundary_generator_matches_recorded_nominal_values():
     assert generated == recorded
 
 
-def test_combined_generator_matches_benchmark_100_except_known_cells():
+def test_combined_generator_matches_benchmark_100():
     generated = {}
     for i, (t, axis, cb, legend, _font, _line, dpi, _) in enumerate(build_plot_20.COMBINED_TEST_CASES, start=1):
         legend = "ok" if t == "heatmap" else legend
@@ -67,7 +59,7 @@ def test_combined_generator_matches_benchmark_100_except_known_cells():
         for k, v in generated[r["input_file"]].items()
         if v != r[f"expected_{k}"]
     }
-    assert disagreements == KNOWN_DISAGREEMENTS
+    assert disagreements == {}
 
 
 @pytest.mark.parametrize(

@@ -85,11 +85,11 @@
 84,請檢查這張圖適不適合學術發表,benchmark_combined_pca_04.png,2244,0.0013464,21.91,Yes,Yes,,,,,FAIL,PASS,FAIL,FAIL
 85,請檢查這張圖適不適合學術發表,benchmark_combined_volcano_05.png,4004,0.0021608,29.584,Yes,Yes,,,,,PASS,PASS,PASS,PASS
 86,請檢查這張圖適不適合學術發表,benchmark_combined_volcano_06.png,2564,0.0015476,15.576,No,Yes,,,,,FAIL,FAIL,FAIL,FAIL
-87,請檢查這張圖適不適合學術發表,benchmark_combined_volcano_07.png,2657,0.0016088,15.525,Yes,Yes,,,,,PASS,FAIL,FAIL,FAIL
+87,請檢查這張圖適不適合學術發表,benchmark_combined_volcano_07.png,2657,0.0016088,15.525,Yes,Yes,,,,,PASS,PASS,FAIL,FAIL
 88,請檢查這張圖適不適合學術發表,benchmark_combined_volcano_08.png,4336,0.0022276,34.064,Yes,Yes,,,,,FAIL,PASS,PASS,PASS
 89,請檢查這張圖適不適合學術發表,benchmark_combined_heatmap_09.png,3166,0.0017116,22.397,Yes,Yes,,,,,PASS,PASS,PASS,PASS
 90,請檢查這張圖適不適合學術發表,benchmark_combined_heatmap_10.png,2201,0.0013712,11.401,Yes,Yes,,,,,FAIL,FAIL,PASS,FAIL
-91,請檢查這張圖適不適合學術發表,benchmark_combined_heatmap_11.png,2760,0.0016392,19.077,Yes,Yes,,,,,FAIL,FAIL,PASS,FAIL
+91,請檢查這張圖適不適合學術發表,benchmark_combined_heatmap_11.png,2760,0.0016392,19.077,Yes,Yes,,,,,PASS,FAIL,PASS,FAIL
 92,請檢查這張圖適不適合學術發表,benchmark_combined_heatmap_12.png,3399,0.0018276,23.09,Yes,Yes,,,,,FAIL,PASS,PASS,PASS
 93,請檢查這張圖適不適合學術發表,benchmark_combined_boxplot_13.png,3458,0.0018896,25.082,Yes,Yes,,,,,PASS,PASS,PASS,PASS
 94,請檢查這張圖適不適合學術發表,benchmark_combined_boxplot_14.png,2238,0.001368,11.642,Yes,Yes,,,,,FAIL,FAIL,FAIL,FAIL

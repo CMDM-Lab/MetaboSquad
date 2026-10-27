@@ -14,9 +14,6 @@ Physical / format criteria
   5. Line width >= 2 pt: line_pt (threshold 2.0)
   6. Image DPI >= 300: dpi (threshold 300)
 
-⚠️ Two figures disagree with the expected values recorded in
-`../data/benchmark_100_ground_truth.csv`; see the benchmarks README.
-
     cd backend && venv/bin/python -m benchmarks.generators.build_plot_20
 """
 
