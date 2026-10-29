@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata from this file."
+type: software
+title: "MetaboSquad: A Multi-Agent Framework for Automated Metabolomics Research Workflows"
+abstract: >-
+  MetaboSquad is a graph-based conversational assistant for metabolomics. A supervisor
+  routes each request to sub-agents for statistical analysis, chemical-database lookup,
+  literature retrieval, figure review and direct question answering.
+authors:
+  - family-names: Yeh
+    given-names: Zhi-Yu
+    affiliation: National Taiwan University
+  - family-names: Kuo
+    given-names: Tien-Chueh
+    affiliation: National Taiwan University
+  - family-names: Tseng
+    given-names: Yufeng Jane
+    affiliation: National Taiwan University
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/CMDM-Lab/MetaboSquad"
+keywords:
+  - metabolomics
+  - large language models
+  - multi-agent systems
+  - LangGraph

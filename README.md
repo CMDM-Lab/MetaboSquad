@@ -94,12 +94,28 @@ Always run the backend tests with `venv/bin/python -m pytest`: the global pytest
 ---
 ## Changing the model
 
-### 1. gemma4:26b
+The default model is OpenAI `gpt-4.1-mini`. The model is set in each file that creates an LLM.
+There is no single setting for it.
 
-Edit the # ===== Ollama ===== section and fill in the required settings
-- `backend/src/graph_agent/supervisor.py` (change the passed-in literature_scoping to literature_gemma)
+### Local model through Ollama (gemma4:26b)
+
+1. Install the client: `pip install langchain-ollama`.
+2. In each file below, comment out the `ChatOpenAI(...)` line and uncomment the `# ===== Ollama =====` block.
+   Set `base_url` if Ollama does not run on `localhost:11434`.
+3. In `backend/src/graph_agent/supervisor.py`, also uncomment
+   `from .graph.literature_gemma import literature_gemma` and change `literature_scoping` to
+   `literature_gemma` in `lit_wrapper`.
+
+Files with a prepared Ollama block:
+- `backend/src/graph_agent/supervisor.py`
 - `backend/src/graph_agent/tools.py`
-- `backend/src/graph_agent/graph/plot_graph.py`
+- `backend/src/graph_agent/use_tool/literature_add.py`
+
+Files without a prepared Ollama block:
+- `backend/src/graph_agent/graph/plot_graph.py` (vision model for figure review; replace it with a model that accepts images)
+- `backend/src/graph_agent/baseline/single_agent.py` (single-agent baseline for the manuscript comparison)
+
+If you do not change a file in these lists, that part of the system continues to use OpenAI.
 
 ---
 ## License

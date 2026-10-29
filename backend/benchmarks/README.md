@@ -176,6 +176,21 @@ continues. A failure reads `⚠️ Pathway analysis failed` instead. The 20
 analysis queries all use peak tables with m/z features only, so pathway
 analysis was skipped for each of them.
 
+### Single-agent baseline
+
+The controller comparison uses one agent in place of the supervisor graph:
+`src/graph_agent/baseline/single_agent.py`. It gets the graph's tools, a
+system prompt that names the task types, and one guide tool per file in
+`src/graph_agent/baseline/skills/`. The agent calls a guide tool to read the
+workflow of a task before it starts the task. This is the setting of the
+benchmark run. The mean tool calls in the manuscript's Table 2 count task-tool
+calls only, not guide-tool calls. `with_skills=False` removes the guide tools.
+The prompts and guides are verbatim, some of them in Chinese. From `backend/`:
+
+```bash
+venv/bin/python -c 'from src.graph_agent.baseline.single_agent import run; run("Look up the PubChem CID and InChIKey of tryptophan")'
+```
+
 ## Environment
 
 The same as the application: `OPENAI_API_KEY`, the `meta_image:v3` R
