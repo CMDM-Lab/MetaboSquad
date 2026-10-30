@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata from this file."
 type: software
-title: "MetaboSquad: A Multi-Agent Framework for Automated Metabolomics Research Workflows"
+title: "MetaboSquad: A Graph-Orchestrated LLM Assistant for Metabolomics Workflows"
 abstract: >-
   MetaboSquad is a graph-based conversational assistant for metabolomics. A supervisor
   routes each request to sub-agents for statistical analysis, chemical-database lookup,
