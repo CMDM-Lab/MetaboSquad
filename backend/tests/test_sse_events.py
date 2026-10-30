@@ -731,3 +731,37 @@ def test_verified_output_folder_falls_back_to_date_glob_when_result_files_invali
         assert result_block["folder"] == f"uploads/output/analysis/{date}"
     finally:
         shutil.rmtree(real_dir, ignore_errors=True)
+
+
+class SlowAgent:
+    """Simulate a long step: nothing is emitted between the two status events."""
+
+    def invoke(self, payload, config=None):
+        import time
+        writer = config["configurable"]["writer"]
+        writer({"status": "Now searching in progress."})
+        time.sleep(0.4)
+        writer({"status": "Summary complete! Ready to download."})
+        return {"messages": [AIMessage(content="done")], "intent": "literature_search"}
+
+
+def test_sends_keepalive_comments_while_a_step_is_silent(chat_client, session, monkeypatch):
+    # Cloudflare closes a proxied connection after about 100 s with no bytes (HTTP 524).
+    # A literature step can stay silent longer than that, so the stream must send
+    # SSE comment lines while it waits. The interval is shortened here to keep the test fast.
+    import api.routers.chat as chat_module
+    monkeypatch.setattr(chat_module, "SSE_HEARTBEAT_SECONDS", 0.05)
+    chat_client.app.state.main_agent = SlowAgent()
+    tid = _prepare(session)
+
+    res = chat_client.post(f"/api/chat/{tid}", json={"message": "find papers"})
+
+    assert res.text.count(": keepalive\n\n") >= 2
+    names = [name for name, _ in _parse_sse(res.text) if name != "message"]
+    assert names[:2] == ["status", "status"]
+    assert names[-1] == "saved"
+
+
+def test_heartbeat_interval_is_below_the_cloudflare_idle_limit():
+    import api.routers.chat as chat_module
+    assert 0 < chat_module.SSE_HEARTBEAT_SECONDS <= 30

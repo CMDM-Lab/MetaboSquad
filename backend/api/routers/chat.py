@@ -37,6 +37,12 @@ DEFAULT_CHAT_TITLE = "新對話"
 # not mistaken for a duplicate and left without a fresh answer forever.
 DUPLICATE_REQUEST_WINDOW_SEC = 10
 
+# If no event arrives for this many seconds, the SSE stream sends a comment line (": keepalive").
+# Cloudflare closes a proxied connection after about 100 s with no bytes (HTTP 524), and one
+# literature step (abstract screening) can stay silent longer than that on a large query.
+# Clients ignore comment lines (frontend/src/lib/sse.ts skips a chunk without a data line).
+SSE_HEARTBEAT_SECONDS = 30
+
 # Structured state fields to send to the frontend (the graph is unchanged; they are just no longer discarded)
 STRUCTURED_KEYS = (
     "analysis_result",
@@ -470,8 +476,12 @@ async def continue_chat(thread_id: str, req: ChatRequest, session: SessionDep,
         # Start listening on the queue and yield to the frontend
         while True:
             await asyncio.sleep(0.01)
-            item = await queue.get()
-            
+            try:
+                item = await asyncio.wait_for(queue.get(), timeout=SSE_HEARTBEAT_SECONDS)
+            except asyncio.TimeoutError:
+                yield ": keepalive\n\n"
+                continue
+
             try:
                 # 1. Detect the end sentinel finally emitted by run_agent
                 if "done" in item:

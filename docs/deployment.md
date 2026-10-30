@@ -42,7 +42,14 @@ pip install torch==2.13.0+cpu --index-url https://download.pytorch.org/whl/cpu
 
 pip install -r ../requirements.txt
 pip install -r requirements-dev.txt      # for testing (pytest)
+
+# requirements.txt pulls torchvision from PyPI, which does not match the CPU torch.
+# Replace it with the CPU build of the same version.
+pip install torchvision==0.28.0+cpu --index-url https://download.pytorch.org/whl/cpu
 ```
+
+If you skip the last step, `import torchvision` fails with
+`RuntimeError: operator torchvision::nms does not exist`, and 4 test files fail during collection.
 
 After installation, verify:
 
@@ -188,6 +195,11 @@ some layer is still buffering. Check in this order:
 
 1. Whether nginx has `proxy_buffering off`
 2. Cloudflare: if needed, add a Configuration Rule for `/api/chat/*` that turns off caching
+
+Cloudflare closes a proxied connection after about 100 s with no bytes (HTTP 524). One literature
+step (abstract screening) can stay silent longer than that on a large query. While it waits, the
+backend sends an SSE comment line (`: keepalive`) every `SSE_HEARTBEAT_SECONDS` (30 s,
+`api/routers/chat.py`). In the `curl -N` output above, these lines appear between events; they are expected.
 
 ---
 

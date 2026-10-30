@@ -38,6 +38,14 @@ describe("parseSseChunks", () => {
     expect(events[0].event).toBe("message");
   });
 
+  it("ignores the backend's keepalive comment lines", () => {
+    // The backend sends ": keepalive" while a step is silent, so Cloudflare does not close the stream.
+    const { events, rest } = parseSseChunks(
+      ': keepalive\n\nevent: status\ndata: {"content":"a","seq":1}\n\n: keepalive\n\n');
+    expect(events).toEqual([{ event: "status", data: { content: "a", seq: 1 } }]);
+    expect(rest).toBe("");
+  });
+
   it("skips an event whose data is not valid JSON rather than failing the whole batch", () => {
     const { events } = parseSseChunks(
       "event: text\ndata: not-json\n\n" +
