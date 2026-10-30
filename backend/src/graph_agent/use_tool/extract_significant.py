@@ -18,7 +18,7 @@ def extract_significant(file) -> list:
     print(f"Agent 嘗試讀取的實體路徑為: {full_path}")
 
     if not full_path.exists():
-        return f"錯誤：找不到檔案，請確認路徑 {full_path} 是否正確"
+        return f"Error: file not found. Please check that the path {full_path} is correct."
 
     try:
         df = pd.read_csv(full_path)
@@ -40,6 +40,6 @@ def extract_significant(file) -> list:
 
         return list(dict.fromkeys(results))
     except Exception as e:
-        return {"csv_summary": f"錯誤：{e}"}
+        return {"csv_summary": f"Error: {e}"}
 
 

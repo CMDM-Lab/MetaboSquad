@@ -264,16 +264,16 @@ def write_output_node(state: LitPubState, config: RunnableConfig) -> dict:
     pubmed_q = state.get("pubmed_query", "")
     queries_md = f"- {pubmed_q}" if pubmed_q else "None"
 
-    strategy_md = f"""- **PubMed search**：{queries_md}"""
+    strategy_md = f"""- **PubMed search**: {queries_md}"""
 
     # ── Section 2: literature screening funnel table (optimised) ──────────────────
     stats_md = f"""
-| 篩選階段 (Screening Stage) | 文獻數量 (Paper Count) | 說明 (Description) |
+| Screening Stage | Paper Count | Description |
 | :--- | :--- | :--- |
-| **1. 原始檢索 (Raw Search)** | {len(raw)} 篇 | PubMed 關鍵字擴展檢索總數 |
-| **2. 標題初篩 (Title Filter)** | {passed_title} / {len(t_filter)} 篇 | 經大模型評估標題具相關性者 |
-| **3. 摘要複篩 (Abstract Filter)** | {passed_abstract} / {passed_title} 篇 | 獲取真實摘要後，經二元相關性確認者 |
-| **4. 最終萃取 (Final Extracted)** | {len(extracted)} 篇 | 成功完成結構化數據特徵萃取之黃金名單 |
+| **1. Raw Search** | {len(raw)} papers | Total records retrieved by the expanded PubMed keyword search |
+| **2. Title Filter** | {passed_title} / {len(t_filter)} papers | Papers whose titles the LLM judged relevant |
+| **3. Abstract Filter** | {passed_abstract} / {passed_title} papers | Papers confirmed relevant by a binary check on the retrieved abstract |
+| **4. Final Extracted** | {len(extracted)} papers | Final set with successful structured data extraction |
 """
 
     # ── Section 4: literature scoring table (grouped by evidence level) ─────────
@@ -282,7 +282,7 @@ def write_output_node(state: LitPubState, config: RunnableConfig) -> dict:
 
     def make_table(papers: list[dict]) -> str:
         if not papers:
-            return "_（無符合此條件之有效文獻）_"
+            return "_(No eligible papers meet these criteria)_"
         rows = []
         for i, p in enumerate(papers):
             # Truncate titles so the table does not blow up
@@ -304,7 +304,7 @@ def write_output_node(state: LitPubState, config: RunnableConfig) -> dict:
             )
 
         header = (
-            "| # | 標題 (年份／連結) | 回答方向 | 核心生醫發現 | population | exposure | outcome | study_design | sample_size | limitation |\n"
+            "| # | Title (Year / Link) | Direction | Key Biomedical Finding | population | exposure | outcome | study_design | sample_size | limitation |\n"
             "|---|-----------------|----------|-------------|------------|----------|---------|-------------|-------------|-------------|"
         )
         return header + "\n" + "\n".join(rows)
@@ -321,54 +321,54 @@ def write_output_node(state: LitPubState, config: RunnableConfig) -> dict:
         yr = p.get('year') or p.get('publication_year', 'N/A')
         
         t_link = f"[{t}]({url})" if url else t
-        raw_md_rows.append(f"- {t_link} `來源: {src}` `層級: {lvl}` | 年份: {yr}")
+        raw_md_rows.append(f"- {t_link} `Source: {src}` `Level: {lvl}` | Year: {yr}")
     
-    raw_md = "\n".join(raw_md_rows) if raw_md_rows else "- （無原始檢索結果）"
+    raw_md = "\n".join(raw_md_rows) if raw_md_rows else "- (No raw search results)"
 
     # ── Assemble the full Markdown report ──────────────────────────────────────────
-    content = f"""# 文獻搜尋與生物醫學證據報告
+    content = f"""# Literature Search and Biomedical Evidence Report
 
-**產生時間**：{date}
-**原始研究問題**：{state['original_query']}
+**Generated at**: {date}
+**Original research question**: {state['original_query']}
 
-原始結果請至{raw_path}查看
+See {raw_path} for the raw results
 ---
 
-## 1. 關鍵字擴展與搜尋策略
+## 1. Keyword Expansion and Search Strategy
 {strategy_md}
 
 ---
 
-## 2. 篩選漏斗與文獻統計
+## 2. Screening Funnel and Paper Counts
 {stats_md}
 
 ---
 
-## 3. 根據文獻綜合回答
+## 3. Evidence-Based Synthesis
 {summary}
 
 ---
 
-## 4. 精選文獻特徵詳細列表
-本列表僅包含通過【標題】與【摘要】雙重篩選，且成功進行結構化特徵萃取的黃金文獻：
+## 4. Detailed Characteristics of Selected Papers
+This list includes only the papers that passed both the title and the abstract screening and had their characteristics successfully extracted into structured data:
 
 {detailed_table_md}
 
 ---
 """
-    raw_content = f"""# 文獻搜尋與生物醫學證據報告
+    raw_content = f"""# Literature Search and Biomedical Evidence Report
 
-**產生時間**：{date}
-**原始研究問題**：{state['original_query']}
-**原始搜尋數量**：共 {len(raw)} 篇 
+**Generated at**: {date}
+**Original research question**: {state['original_query']}
+**Raw search count**: {len(raw)} papers in total
 
-篩選結果請至{path}查看
+See {path} for the screened results
 
-## 1. 關鍵字擴展與搜尋策略
+## 1. Keyword Expansion and Search Strategy
 {strategy_md}
 
 ---
-## 2. 原始檢索結果總覽 (未篩選前明細)
+## 2. Overview of Raw Search Results (Before Screening)
 {raw_md}
 
 ---
@@ -385,7 +385,7 @@ def write_output_node(state: LitPubState, config: RunnableConfig) -> dict:
         })
 
     return {
-        "messages":    [AIMessage(content=f"查詢報告已成功儲存至：\n* Summary: `{path}`\n* Raw: `{raw_path}`")],
+        "messages":    [AIMessage(content=f"Literature reports saved to:\n* Summary: `{path}`\n* Raw: `{raw_path}`")],
         "output_path": path,
     }
 

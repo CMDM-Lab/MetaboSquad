@@ -238,7 +238,7 @@ def pubchem_lookup_node(state: AnalysisState, config: RunnableConfig) -> dict:
 
     rows_text = "\n".join(table_rows)
     pubchem_section = f"""
-## PubChem 代謝物詳細資料彙整
+## PubChem Metabolite Details
 
 | name | CID | Molecular Formula | Molecular Weight | IUPAC name | InChIKey | SMILES | KEGG | HMDB | ChEBI | DrugBank | link |
 |--------|-----|-----------------|-------------------|-----------|--------|----------|-------|------|------|----------|--------|
@@ -256,7 +256,7 @@ def pathway_analysis_node(state: AnalysisState, config: RunnableConfig) -> dict:
     writer = config.get("configurable", {}).get("writer")
     if writer:
         writer({"status": "PubChem search complete, Pathway analysis in progress."})
-    """顯著代謝物的通路富集分析（ORA + GSEA Prerank）"""
+    """Pathway enrichment analysis of the significant metabolites (ORA + GSEA Prerank)"""
     metabolites = state.get("significant_metabolites", [])
     background_names = state.get("all_detected_features", [])
     scores_list = state.get("metabolite_scores", [])
@@ -375,7 +375,7 @@ def save_significant_node(state: dict, config: RunnableConfig) -> dict:
     # file_path is an internal path (with the compensating ../../ prefix), not an analysis parameter; omit it.
     config_rows = "\n".join(
         f"| `{k}` | `{v}` |" for k, v in config.items() if k != "file_path"
-    ) or "| _（無）_ | |"
+    ) or "| _(none)_ | |"
 
     recommendations = analysis_result.get("recommend")
     if isinstance(recommendations, list) and recommendations:
@@ -385,7 +385,7 @@ def save_significant_node(state: dict, config: RunnableConfig) -> dict:
             for r in recommendations
         )
     else:
-        recommend_rows = "| _（無建議紀錄）_ | |"
+        recommend_rows = "| _(no recommendations recorded)_ | |"
 
     pubchem_table   = state.get("pubchem_table_text", "This analysis did not trigger the identification of metabolites.")
     
@@ -419,7 +419,7 @@ def save_significant_node(state: dict, config: RunnableConfig) -> dict:
         pathway_summary_text = (
             f"* **Successfully matched KEGG IDs**: {len(pathway_res.get('mapped_kegg_ids', []))} metabolites\n"
             f"* **ORA (with Topology) Summary**:\n"
-            f"  - Significantly enriched pathways ($P < 0.05$): {ora.get('significant_pathways_count', 0)}條\n"
+            f"  - Significantly enriched pathways ($P < 0.05$): {ora.get('significant_pathways_count', 0)}\n"
             f"  - Top perturbed pathway: **{top_pathway_name}** (Pathway Impact Score: {top_impact:.4f})\n"
             f"* **GSEA Summary**:\n"
             f"  - Top enriched term: **{gsea.get('top_enrichment_term', 'N/A')}** (NES: {gsea.get('top_enrichment_nes', 0.0):.4f}, FDR: {gsea.get('top_enrichment_fdr', 1.0):.4f})\n"
@@ -446,30 +446,30 @@ def save_significant_node(state: dict, config: RunnableConfig) -> dict:
 
 ## ⚙️ Analysis Parameters (Auto-detected / Defaults)
 
-以下參數由系統依資料特性判定或採用預設值。**正規化與縮放會直接影響結果解讀**，
-請確認是否符合您的分析意圖。
+The system set the parameters below from the data characteristics or used the default values. **Normalization and scaling directly affect how the results are interpreted**;
+please check that they match your analysis intent.
 
-| 參數 (Parameter) | 使用值 (Value) |
+| Parameter | Value |
 | :--- | :--- |
 {config_rows}
 
-### 目前固定、無法調整的統計參數
+### Fixed statistical parameters (not adjustable)
 
-下列數值寫死在 R 腳本模板中，本版**不可調整**（列出來是為了讓您能判斷結果是否可信）：
+The values below are hard-coded in the R script template and **cannot be adjusted** in this version (they are listed so that you can judge whether the results are reliable):
 
-| 參數 (Parameter) | 固定值 (Fixed) | 說明 |
+| Parameter | Fixed value | Description |
 | :--- | :--- | :--- |
-| `fc.thresh` | 2.0 | Fold change 顯著門檻 |
-| `threshp` | 0.05 | 校正後 p-value（FDR）門檻 |
-| `equal.var` | TRUE | 假設等變異數（Student's t-test）；若改為 FALSE 則為 Welch's t-test |
-| 多重比較校正 | `"fdr"` | Benjamini-Hochberg |
-| PCA 主成分數 | 5 | Scree／pairs plot 顯示的主成分數量 |
+| `fc.thresh` | 2.0 | Fold change significance threshold |
+| `threshp` | 0.05 | Adjusted p-value (FDR) threshold |
+| `equal.var` | TRUE | Assumes equal variances (Student's t-test); FALSE would give Welch's t-test |
+| Multiple-testing correction | `"fdr"` | Benjamini-Hochberg |
+| Number of PCA components | 5 | Number of principal components shown in the scree and pairs plots |
 
 ---
 
 ## 🧭 Why These Analyses
 
-| 分析模組 (Module) | 選用理由 (Reason) |
+| Module | Reason |
 | :--- | :--- |
 {recommend_rows}
 

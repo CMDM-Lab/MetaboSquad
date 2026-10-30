@@ -82,3 +82,21 @@ def spy_chat_client_fixture(session):
         c.app.state.main_agent = FakeAgent()
         yield c
     app.dependency_overrides.clear()
+
+
+def test_chat_with_the_legacy_chinese_default_title_is_still_renamed(spy_chat_client, session):
+    """Chats created before the English switch are stored with the old default title.
+
+    They have not been named yet either, so the first message must still become the title.
+    """
+    from api.routers.chat import LEGACY_DEFAULT_CHAT_TITLES
+    session.add(Chat(thread_id="th-legacy", title=LEGACY_DEFAULT_CHAT_TITLES[0]))
+    session.commit()
+
+    spy_chat_client.post("/api/chat/th-legacy",
+                         json={"message": "citric acid CID"})
+
+    from sqlmodel import select
+    session.expire_all()
+    chat = session.exec(select(Chat).where(Chat.thread_id == "th-legacy")).one()
+    assert chat.title == "citric acid CID"

@@ -85,7 +85,7 @@ def pubchem_node(state: IdMappingState, config: RunnableConfig) -> dict:
 
     rows_text = "\n".join(table_rows)
     pubchem_section = f"""
-## PubChem 代謝物詳細資料彙整
+## PubChem Metabolite Details Summary
 
 | name | CID | Molecular Formula | Molecular Weight | IUPAC name | InChIKey | SMILES | KEGG | HMDB | ChEBI | DrugBank | link |
 |--------|-----|-----------------|-------------------|-----------|--------|----------|-------|------|------|----------|--------|

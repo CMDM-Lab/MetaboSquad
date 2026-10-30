@@ -25,7 +25,7 @@ def extract_schema_and_config(
     print(f"Agent 嘗試讀取的實體路徑為: {full_path}")
 
     if not full_path.exists():
-        return {f"csv_summary":"找不到檔案，請確認路徑 {full_path} 是否正確"}
+        return {f"csv_summary":"File not found. Please check that the path {full_path} is correct."}
 
     # 4. Only then hand it to LangChain or Pandas
     # loader = CSVLoader(file_path=str(full_path))
@@ -102,19 +102,19 @@ def extract_schema_and_config(
                 )
 
                 group_info = (
-                    f"'{group_col}' (共 {group_count} 組："
-                    f"{', '.join(map(str, group_names))}，各組分佈：{group_summary_text})"
+                    f"'{group_col}' ({group_count} groups: "
+                    f"{', '.join(map(str, group_names))}; group sizes: {group_summary_text})"
                 )
             else:
-                group_info = "未偵測到分組欄位"
+                group_info = "No group column detected"
         
 
             # === Step 4: summary ===
-            summary = f"""成功解析 CSV！
-            - 偵測方向: {"每一個 column 是一個樣本" if is_transposed else "每一個 row 是一個樣本"}
-            - 總樣本數: {analysis_df.shape[0]}
-            - 總特徵數: {analysis_df.shape[1]}
-            - 分組欄位: {group_info}
+            summary = f"""CSV parsed successfully.
+            - Detected orientation: {"each column is one sample" if is_transposed else "each row is one sample"}
+            - Total samples: {analysis_df.shape[0]}
+            - Total features: {analysis_df.shape[1]}
+            - Group column: {group_info}
             """
 
             # --- Step 4: decide parameters ---    
@@ -147,8 +147,8 @@ def extract_schema_and_config(
             }
 
         except Exception as e:
-            return {"csv_summary": f"錯誤：{e}"}#, "schema": []}
-    return {"csv_summary": "尚未上傳檔案"}#, "schema": []}
+            return {"csv_summary": f"Error: {e}"}#, "schema": []}
+    return {"csv_summary": "No file has been uploaded yet."}#, "schema": []}
 
 def diagnose_data_and_recommend(
     group_count: int,
@@ -162,26 +162,26 @@ def diagnose_data_and_recommend(
     if group_count == 2:
         recommendations.append({
             "analysis": "fold-change",
-            "reason": "計算兩組間倍數變化，快速篩選差異特徵",
+            "reason": "Computes the fold change between the two groups to quickly screen for differential features",
         })
         recommendations.append({
             "analysis": "t-test",
-            "reason": "兩組統計顯著性檢定",
+            "reason": "Tests the statistical significance of differences between the two groups",
         })
         recommendations.append({
             "analysis": "volcano",
-            "reason": "同時視覺化倍數變化與統計顯著性",
+            "reason": "Visualizes fold change and statistical significance together",
         })
 
     if group_count >= 3:
         recommendations.append({
             "analysis": "anova",
-            "reason": f"多組（{group_count} 組）比較使用 ANOVA",
+            "reason": f"Multiple groups ({group_count} groups) are compared with ANOVA",
         })
 
     recommendations.append({
         "analysis": "pca",
-        "reason": "探索樣本整體分佈結構，是任何分析的基礎探索步驟",
+        "reason": "Explores the overall structure of the sample distribution; the basic exploratory step for any analysis",
     })
 
 
@@ -403,7 +403,7 @@ def run_r_code(r_code,  file_name):
             logs, timeout_err = execute_docker(new_r_code, allow_network=True)
 
             if timeout_err:
-                return False, f"安裝套件逾時: {timeout_err}"
+                return False, f"Package installation timed out: {timeout_err}"
 
             output = logs.decode("utf-8") if isinstance(logs, bytes) else logs
             
@@ -426,7 +426,7 @@ def run_r_code(r_code,  file_name):
         ]
 
         if not produced_files:
-            return False, f"找不到任何輸出檔案\n\nOutput:\n{output}"
+            return False, f"No output files found\n\nOutput:\n{output}"
 
         # Copy everything to uploads
         saved_paths = []
@@ -471,16 +471,16 @@ def run_r_code(r_code,  file_name):
                 output = logs.decode("utf-8") if isinstance(logs, bytes) else logs
                 # Continue with the rest of the file-collection logic...
         
-        return False, f"R 執行錯誤：\n{stderr}"
+        return False, f"R execution error:\n{stderr}"
 
     except docker.errors.ImageNotFound:
-        return False, "找不到 Docker image：metabo_docker:v1"
+        return False, "Docker image not found: metabo_docker:v1"
 
     except docker.errors.APIError as e:
-        return False, f"Docker API 錯誤：{str(e)}"
+        return False, f"Docker API error: {str(e)}"
 
     except Exception as e:
-        return False, f"未預期錯誤：{str(e)}"
+        return False, f"Unexpected error: {str(e)}"
 
     finally:
         shutil.rmtree(work_dir, ignore_errors=True)
@@ -498,7 +498,7 @@ def recommend_and_analysis(
     try:
         extract_schema = extract_schema_and_config(file, group_name, paired, label_is_continuous)
     except Exception as e:
-        return {"csv_summary": f"錯誤：{e}"}
+        return {"csv_summary": f"Error: {e}"}
 
     group_count = extract_schema.get("group_count")
     summary = extract_schema.get("csv_summary")
@@ -507,7 +507,7 @@ def recommend_and_analysis(
     try:
         diagnosis = diagnose_data_and_recommend(group_count)
     except Exception as e:
-        return {"recommend": f"錯誤：{e}"}
+        return {"recommend": f"Error: {e}"}
 
     # Variable renamed from `result` to `diagnosis`: previously the
     # `success, result = run_r_code(...)` below overwrote it completely, so the returned
@@ -524,12 +524,12 @@ def recommend_and_analysis(
     try:
         config = get_default_config(module_names, config_by_data)
     except Exception as e:
-        return {"get_modules": f"錯誤：{e}"}
+        return {"get_modules": f"Error: {e}"}
     
     try:
         r_code = generate_combined_code(module_names, config)
     except Exception as e:
-        return {"generate_code": f"錯誤：{e}"}
+        return {"generate_code": f"Error: {e}"}
 
     
     r_code = r_code.replace('"uploads/', '"/uploads/').replace("'uploads/", "'/uploads/")
@@ -537,7 +537,7 @@ def recommend_and_analysis(
     try:
         success, run_result = run_r_code(r_code, file)
     except Exception as e:
-        return {"run_r_code": f"錯誤：{e}"}
+        return {"run_r_code": f"Error: {e}"}
 
     all_paths=[]
 

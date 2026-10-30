@@ -16,6 +16,6 @@ def get_artifacts(folder: str = Query(...)) -> dict[str, Any]:
     try:
         return list_folder(folder)
     except ValueError:
-        raise HTTPException(status_code=403, detail="不合法的路徑")
+        raise HTTPException(status_code=403, detail="Invalid path")
     except FileNotFoundError:
-        raise HTTPException(status_code=404, detail="找不到資料夾")
+        raise HTTPException(status_code=404, detail="Folder not found")

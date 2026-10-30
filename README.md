@@ -118,6 +118,16 @@ Files without a prepared Ollama block:
 If you do not change a file in these lists, that part of the system continues to use OpenAI.
 
 ---
+## Reproducing the manuscript results
+
+The benchmark results in the manuscript were produced with the original prompts, which were written in Chinese.
+Version 0.1.0 translates all prompts and reports into English, so the model can behave differently from the runs reported in the manuscript.
+
+- To reproduce the manuscript runs, use commit [`b5f57ff`](https://github.com/CMDM-Lab/MetaboSquad/tree/b5f57ff), the last version with the original prompts.
+- The single-agent baseline (`backend/src/graph_agent/baseline/`) keeps its original prompt and skill files in every version.
+- The benchmark data and evaluation records are archived at https://doi.org/10.5281/zenodo.23055510.
+
+---
 ## License
 
 MetaboSquad is released under the [MIT License](LICENSE).

@@ -35,17 +35,17 @@ import pytest
 from api.artifacts import UPLOAD_ROOT
 
 RECOMMENDATIONS = [
-    {"analysis": "fold-change", "reason": "計算兩組間倍數變化，快速篩選差異特徵"},
-    {"analysis": "t-test", "reason": "兩組統計顯著性檢定"},
-    {"analysis": "pca", "reason": "探索樣本整體分佈結構，是任何分析的基礎探索步驟"},
+    {"analysis": "fold-change", "reason": "Computes the fold change between the two groups to quickly screen for differential features"},
+    {"analysis": "t-test", "reason": "Tests the statistical significance of differences between the two groups"},
+    {"analysis": "pca", "reason": "Explores the overall structure of the sample distribution; the basic exploratory step for any analysis"},
 ]
 CONFIG = {
     "file_path": "../../uploads/csv/lcms_table.csv",
     "paired": "FALSE", "format": "colu", "label.type": "disc",
     "rowNorm": "NULL", "transNorm": "LogNorm", "scaleNorm": "AutoNorm",
 }
-SUMMARY = ("成功解析 CSV！\n- 總樣本數: 12\n- 總特徵數: 410\n"
-           "- 分組欄位: 'Label' (共 2 組：KO, WT，各組分佈：KO (n=6), WT (n=6))")
+SUMMARY = ("CSV parsed successfully.\n- Total samples: 12\n- Total features: 410\n"
+           "- Group column: 'Label' (2 groups: KO, WT; group sizes: KO (n=6), WT (n=6))")
 
 
 @pytest.fixture(name="report_dir")
@@ -84,7 +84,7 @@ FULL_RESULT = {
 
 def test_report_shows_data_characteristics(report_dir):
     content = _render(report_dir, analysis_result=FULL_RESULT)
-    assert "總樣本數: 12" in content
+    assert "Total samples: 12" in content
     assert "410" in content
     assert "KO (n=6)" in content
 
@@ -119,7 +119,7 @@ def test_report_flags_the_hardcoded_parameters(report_dir):
     # for "fixed" -- the table header already contains the fixed-value label, so with
     # an `or` fallback on that word the test would stay green even if the whole
     # explanation were removed (the first version did exactly that; mutation testing caught it).
-    assert "不可調整" in content, (
+    assert "cannot be adjusted" in content, (
         "有列出參數，但沒說明它們目前不可調整——醫師會以為那是系統依資料選的，"
         "而不是本版的限制"
     )
@@ -131,9 +131,9 @@ def test_report_degrades_gracefully_when_fields_are_missing(report_dir):
     This covers a real failure: when R execution fails, recommend_and_analysis returns
     early with a dict of only one key. The report must still be written.
     """
-    content = _render(report_dir, analysis_result={"summary": "錯誤：找不到檔案"})
+    content = _render(report_dir, analysis_result={"summary": "Error: file not found"})
     assert "Comprehensive Metabolic Analysis Report" in content
-    assert "錯誤：找不到檔案" in content
+    assert "Error: file not found" in content
 
 
 def test_recommend_field_carries_recommendations_not_the_r_file_list():
@@ -146,7 +146,7 @@ def test_recommend_field_carries_recommendations_not_the_r_file_list():
     """
     import src.graph_agent.use_tool.code as code
 
-    fake_recs = {"recommendations": [{"analysis": "t-test", "reason": "測試理由"}]}
+    fake_recs = {"recommendations": [{"analysis": "t-test", "reason": "test reason"}]}
     fake_run = (True, {"files": [{"path": "/backend/uploads/output/analysis/x/t_test.csv"}]})
 
     orig = (code.extract_schema_and_config, code.diagnose_data_and_recommend,

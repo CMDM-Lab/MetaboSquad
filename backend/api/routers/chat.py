@@ -29,7 +29,10 @@ router = APIRouter(
 # strings, so the "use the first message as the title" branch never ran -- every chat stayed
 # at the default title. A single constant means the two sides can no longer drift.
 # Guarded by tests/test_chat_titles.py.
-DEFAULT_CHAT_TITLE = "新對話"
+DEFAULT_CHAT_TITLE = "New chat"
+# Default titles written before the English switch. Chats stored with one of these have not been
+# named yet either, so continue_chat still renames them from the first message.
+LEGACY_DEFAULT_CHAT_TITLES = ("新對話",)
 
 # Time window (seconds) for the duplicate-request early return. See the check in chat_with_agent below.
 # It guards against replays of the form "the answer just landed and the same message is sent again";
@@ -282,7 +285,7 @@ async def continue_chat(thread_id: str, req: ChatRequest, session: SessionDep,
     statement = select(Chat).where(Chat.thread_id == thread_id)
     chat_db = session.exec(statement).first()
     # If the title is still the default, use the first few characters of the first message as the title
-    if chat_db and chat_db.title == DEFAULT_CHAT_TITLE:
+    if chat_db and chat_db.title in (DEFAULT_CHAT_TITLE, *LEGACY_DEFAULT_CHAT_TITLES):
         chat_db.title = req.message[:20] 
         session.add(chat_db)
         session.commit()
@@ -595,7 +598,7 @@ async def continue_chat(thread_id: str, req: ChatRequest, session: SessionDep,
                 session.rollback()
                 print(f"❌ 寫入資料庫失敗: {db_err}")
                 yield ("event: error\ndata: "
-                       + json.dumps({"content": f"回覆儲存失敗：{db_err}"})
+                       + json.dumps({"content": f"Failed to save the reply: {db_err}"})
                        + "\n\n")
 
     # Return a standard SSE streaming response
@@ -625,7 +628,7 @@ def delete_chat(thread_id: str, session: SessionDep):
     chat_db = session.exec(statement).first()
 
     if not chat_db:
-        raise HTTPException(status_code=404, detail="對話不存在")
+        raise HTTPException(status_code=404, detail="Chat not found")
 
     try:
         # --- Added: delete the associated chat records (ChatMessage) first ---
@@ -654,9 +657,9 @@ def delete_chat(thread_id: str, session: SessionDep):
     except Exception as e:
         session.rollback()
         print(f"刪除失敗: {e}")
-        raise HTTPException(status_code=500, detail="刪除過程發生錯誤")
+        raise HTTPException(status_code=500, detail="An error occurred while deleting the chat")
 
-    return {"status": "success", "message": f"已成功刪除對話 {thread_id} 及其所有關聯資料"}
+    return {"status": "success", "message": f"Deleted chat {thread_id} and all its associated data"}
 
 # 3. Get the chat list (for the sidebar)
 @router.get("/", response_model= ChatListResponse)
@@ -676,7 +679,7 @@ def update_chat(thread_id: str, chat_update: ChatUpdate, session: SessionDep):
     statement = select(Chat).where(Chat.thread_id == thread_id)
     chat_db = session.exec(statement).first()
     if not chat_db:
-        raise HTTPException(status_code=404, detail="對話不存在")
+        raise HTTPException(status_code=404, detail="Chat not found")
     
     # Only update the fields that were passed in (exclude_unset=True)
     update_data = chat_update.model_dump(exclude_unset=True)

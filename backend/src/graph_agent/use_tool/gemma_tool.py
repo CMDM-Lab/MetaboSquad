@@ -80,7 +80,7 @@ def write_file(path: str, content: str) -> str:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
-    return f"檔案已儲存至 {path}"
+    return f"File saved to {path}"
 
 
 # ── 5. Gemma Tools ──────────────────────────────────────────────────────────

@@ -56,6 +56,6 @@ async def query_pubchem(request: MappingID):
             }
             
         except httpx.HTTPStatusError as e:
-            raise HTTPException(status_code=e.response.status_code, detail=f"PubChem 錯誤: {e.response.text}")
+            raise HTTPException(status_code=e.response.status_code, detail=f"PubChem error: {e.response.text}")
         except Exception as e:
-            raise HTTPException(status_code=500, detail=f"連線失敗: {str(e)}")
+            raise HTTPException(status_code=500, detail=f"Connection failed: {str(e)}")

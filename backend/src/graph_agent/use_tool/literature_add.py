@@ -703,7 +703,7 @@ def extract_keyword_contexts(fulltext: str, keyword: str, context_paragraphs: in
 
 class MetaboliteEvaluation(BaseModel):
     is_important: bool
-    role: Literal["核心研究對象", "顯著標誌物", "僅背景提及", "層次不高"]
+    role: Literal["core research subject", "significant marker", "background mention only", "low relevance"]
     score: int  # 1-5
     reason: str
     direction: Literal["positive", "negative", "neutral"]  # ← added
@@ -719,31 +719,31 @@ def llm_evaluate_metabolite_importance(
         return {
             "is_important": False,
             "score": 0,
-            "reason": "內文未匹配到關鍵字",
+            "reason": "Keyword not found in the full text",
             "direction": "neutral",
             "key_finding": "",
         }
 
-    combined = "\n\n=== 新片段 ===\n\n".join(snippets)[:6000]
+    combined = "\n\n=== New snippet ===\n\n".join(snippets)[:6000]
 
     structured_llm = llm.with_structured_output(MetaboliteEvaluation)
 
     resp = structured_llm.invoke([
         SystemMessage(content=(
-            "你是一位專精於代謝體學與生物資訊學的專家。"
-            "請評估目標代謝物在論文內文片段中發揮的角色。\n\n"
-            "評估準則：\n"
-            "- 核心研究對象/顯著標誌物/明確濃度變化討論 → is_important=true, score 4-5\n"
-            "- 背景介紹順帶提及/無關表格清單 → is_important=false, score 1-2\n\n"
-            "direction 判斷：\n"
-            "- positive：代謝物濃度上升或活性增加與疾病正相關\n"
-            "- negative：代謝物濃度下降或活性降低與疾病相關\n"
-            "- neutral：方向不明確或片段資訊不足以判斷\n\n"
-            "key_finding：用一句話總結這篇文獻關於該代謝物的核心發現。"
+            "You are an expert in metabolomics and bioinformatics. "
+            "Evaluate the role that the target metabolite plays in the full-text snippets of the paper.\n\n"
+            "Evaluation criteria:\n"
+            "- Core research subject / significant marker / explicit discussion of concentration changes → is_important=true, score 4-5\n"
+            "- Incidental mention in the background / unrelated table or list → is_important=false, score 1-2\n\n"
+            "direction:\n"
+            "- positive: an increase in metabolite concentration or activity is positively associated with the disease\n"
+            "- negative: a decrease in metabolite concentration or activity is associated with the disease\n"
+            "- neutral: the direction is unclear or the snippets do not contain enough information to decide\n\n"
+            "key_finding: summarize in one sentence the core finding of this paper about the metabolite. Write it in English."
         )),
         HumanMessage(content=(
-            f"目標代謝物：{keyword}\n\n"
-            f"內文片段：\n{combined}"
+            f"Target metabolite: {keyword}\n\n"
+            f"Full-text snippets:\n{combined}"
         )),
     ])
 

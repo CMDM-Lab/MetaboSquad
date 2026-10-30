@@ -75,7 +75,7 @@ def extract_significant(file: str, fdr_cutoff: float = 0.05) -> str:
 
     # 4. Safety check: if the file is not found, return a JSON error safely
     if not full_path.exists():
-        return f"錯誤：找不到檔案，請確認路徑 {full_path} 是否正確"
+        return f"Error: file not found. Please check that the path {full_path} is correct."
 
     # 5. Read the file
     df = pd.read_csv(full_path)
@@ -90,7 +90,7 @@ def extract_significant(file: str, fdr_cutoff: float = 0.05) -> str:
     fdr_col = next((c for c in df.columns if c.lower() in ['fdr', 'adj.p.val', 'q.value', 'qvalue']), None)
 
     if not p_col or not t_col:
-        return f"錯誤，缺少統計值欄位或 p-value 欄位，現有欄位: {list(df.columns)}"
+        return f"Error: the statistic column or the p-value column is missing. Available columns: {list(df.columns)}"
 
     df['FDR_fill'] = df[fdr_col] if fdr_col else df[p_col]
     
@@ -204,7 +204,7 @@ def mummichog_analysis(
         # `elif mummichog_res and "error" in mummichog_res` branch there writes the message
         # into the report (it was written for exactly this case).
         return {"status": "error",
-                "error": f"錯誤：找不到檔案，請確認路徑 {full_path} 是否正確"}
+                "error": f"Error: file not found. Please check that the path {full_path} is correct."}
 
     # Verify that the required columns meet Mummichog's requirements
     # Note: Mummichog's standard column names are usually 'm/z', 'p-value', 't-score'
@@ -214,7 +214,7 @@ def mummichog_analysis(
     required = {'m/z', 'p-value', 't-score'}
     missing = required - set(df.columns)
     if missing:
-        raise ValueError(f"峰表缺少必要欄位：{missing}\n現有欄位：{list(df.columns)}")
+        raise ValueError(f"The peak table is missing required columns: {missing}\nAvailable columns: {list(df.columns)}")
         
     # ----------------------------------------------------------------
     # Core change: build the Mummichog CLI command
@@ -237,14 +237,14 @@ def mummichog_analysis(
         result = subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         print("Mummichog 執行成功！")
         print(result.stdout)
-        return {"status":"success", "result":f"Mummichog 完成！結果已存至 {full_path.parent}"}
+        return {"status":"success", "result":f"Mummichog completed. Results saved to {full_path.parent}"}
         
     except subprocess.CalledProcessError as e:
         print("Mummichog 執行失敗！")
         print(e.stderr)
-        return {"status":"error", "error":f"執行錯誤: {e.stderr}"}
+        return {"status":"error", "error":f"Execution error: {e.stderr}"}
     except FileNotFoundError:
-        return {"status":"error", "error":"錯誤：系統中未偵測到 'mummichog' 指令，請確認是否已安裝並加入環境變數。"}
+        return {"status":"error", "error":"Error: the 'mummichog' command was not found. Please check that it is installed and on the PATH."}
 # result=mummichog_analysis("graph_agent/t_test_mummichog.txt")
 
 # =============================================================================
@@ -713,7 +713,7 @@ def run_ora_analysis(
     n = len(set_sig)  # Total significant metabolites (Study set)
     
     if n == 0:
-        return json.dumps({"status": "failed", "message": "經與背景比對後，顯著代謝物有效數量為 0。"})
+        return json.dumps({"status": "failed", "message": "After matching against the background, the number of valid significant metabolites is 0."})
 
     # --- Step 3: compute the hypergeometric distribution for each pathway ---
     final_results = []
@@ -753,7 +753,7 @@ def run_ora_analysis(
         })
 
     if not final_results:
-        return json.dumps({"status": "failed", "message": "所有路徑皆無命中任何顯著代謝物。"})
+        return json.dumps({"status": "failed", "message": "No pathway contains any significant metabolite."})
 
     # --- Step 4: convert to DataFrame, run multiple-testing correction (FDR), and save ---
     res_df = pd.DataFrame(final_results)

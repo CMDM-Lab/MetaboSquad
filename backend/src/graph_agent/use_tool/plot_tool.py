@@ -129,8 +129,8 @@ def analyze_resolution(
 def dpi_pass_analysis(effective_dpi: float) -> Dict[str, str]:
     """Keep a PASS/FAIL verdict for DPI: one of the few hard requirements stated explicitly by almost every journal."""
     if effective_dpi >= 300:
-        return {"dpi_status": "PASS", "dpi_suggestion": "DPI 大於 300，通過測試"}
-    return {"dpi_status": "FAIL", "dpi_suggestion": "DPI 小於 300，請提高解析度"}
+        return {"dpi_status": "PASS", "dpi_suggestion": "DPI is at least 300; check passed"}
+    return {"dpi_status": "FAIL", "dpi_suggestion": "DPI is below 300; please increase the resolution"}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -178,7 +178,7 @@ def text_size_analysis(
     """
     if not text_list:
         return {
-            "text_note": "圖中未偵測到文字",
+            "text_note": "No text detected in the figure",
             "min_pt": None,
             "avg_pt": None,
             "ge_reference_pt_ratio": None,
@@ -191,10 +191,10 @@ def text_size_analysis(
 
     return {
         "text_note": (
-            f"偵測到 {total_count} 項文字，最小 {round(min(pt_sizes), 2)} pt、"
-            f"平均 {round(sum(pt_sizes) / total_count, 2)} pt，"
-            f"其中 {ge_ratio_percent}% ({ge_count}/{total_count}) 達 {reference_pt} pt 以上。"
-            " 請自行依投稿期刊規範確認是否合規。"
+            f"Detected {total_count} text items: minimum {round(min(pt_sizes), 2)} pt, "
+            f"average {round(sum(pt_sizes) / total_count, 2)} pt; "
+            f"{ge_ratio_percent}% ({ge_count}/{total_count}) are at least {reference_pt} pt."
+            " Please check compliance against the target journal's submission guidelines."
         ),
         "min_pt": round(min(pt_sizes), 2),
         "avg_pt": round(sum(pt_sizes) / total_count, 2),
@@ -262,7 +262,7 @@ def estimate_line_width_distance_transform(
     """Estimate line width using a distance transform and skeletonization."""
     img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
     if img is None:
-        raise ValueError(f"無法讀取圖片：{image_path}")
+        raise ValueError(f"Cannot read image: {image_path}")
 
     if ocr_bboxes:
         img = _mask_text_regions(img, ocr_bboxes, padding=padding, fill_value=255)
@@ -310,9 +310,9 @@ def line_width_analysis(median_width_pt: float, estimated_true_line_pt: float, r
     """
     return {
         "line_note": (
-            f"估計線寬（75百分位）為 {median_width_pt} pt"
-            f"估計線寬（75百分位）為 {estimated_true_line_pt} pt"
-            f"（常見參考門檻 {reference_pt} pt）。請自行依投稿期刊規範確認是否合規。"
+            f"Estimated line width (50th percentile): {median_width_pt} pt; "
+            f"estimated line width (75th percentile): {estimated_true_line_pt} pt"
+            f" (common reference threshold: {reference_pt} pt). Please check compliance against the target journal's submission guidelines."
         ),
         "median_width_pt":median_width_pt,
         "estimated_true_line_pt": estimated_true_line_pt,
@@ -550,7 +550,7 @@ def _check_palette_pairwise_confusability(
     if len(colors_rgb) < 2:
         return {"confusable_pairs": [], "total_pairs_tested": 0,
                 "threshold_used_ab": threshold_ab, "compliant": True,
-                "note": "萃取的顏色少於 2 種，無法進行兩兩比對"}
+                "note": "Fewer than 2 colors extracted; pairwise comparison is not possible"}
 
     colors_255 = np.array(colors_rgb, dtype=np.uint8)
     simulator = simulate.Simulator_Brettel1997()
@@ -601,15 +601,15 @@ def _check_palette_pairwise_confusability(
 
                 if orig_dist < threshold_ab:
                     # Already indistinguishable, not caused by colorblindness; put it in the other group
-                    pair_info["severity"] = "原始色彩本身對比不足（非色盲特有問題）"
+                    pair_info["severity"] = "Insufficient contrast in the original colors (not a colorblind-specific problem)"
                     pre_existing_low_contrast_pairs.append(pair_info)
                 elif dist_ab < threshold_ab:
                     # Distinguishable originally but collapsed after simulation: the true colorblind-specific problem
-                    severity = "嚴重（明度也難以區分）" if dist_full < threshold_full_lab else "中度（或可靠明度區分，但風險仍高）"
+                    severity = "Severe (lightness also fails to separate the pair)" if dist_full < threshold_full_lab else "Moderate (lightness may separate the pair, but the risk is still high)"
                     pair_info["severity"] = severity
                     confusable_pairs.append(pair_info)
                 else:
-                    pair_info["severity"] = "區分效果尚可"
+                    pair_info["severity"] = "Acceptable separation"
                     unconfusable_pairs.append(pair_info)
 
     return {
@@ -620,11 +620,11 @@ def _check_palette_pairwise_confusability(
         "threshold_used_ab": threshold_ab,
         "compliant": len(confusable_pairs) == 0,
         "note": (
-            f"{len(pre_existing_low_contrast_pairs)} 組色彩本身（未經色盲模擬）即已對比不足。"
-            f"共測試 {total_pairs_tested} 組色盲類型組合，其中 {len(confusable_pairs)} 組觸發混淆門檻。"
-            "色相塌陷為主要判準（學術圖表資料點通常面積小，不假設讀者能可靠辨識細微明度差異）；"
-            "額外標註是否連明度也難以區分（severity），供你判斷風險等級，而非單一二元結論。"
-            f"嚴重：代表明度去除後距離差異 <{threshold_full_lab}；中度：代表雖然顏色在 CIELAB 色度空間中距離 <{threshold_ab} 但是明度去除後距離差異 >={threshold_full_lab}"
+            f"{len(pre_existing_low_contrast_pairs)} color pairs already have insufficient contrast in the original colors (without colorblind simulation). "
+            f"Tested {total_pairs_tested} colorblind-type/color-pair combinations; {len(confusable_pairs)} triggered the confusion threshold. "
+            "Hue collapse is the main criterion (data points in scientific figures are usually small, so readers are not assumed to reliably distinguish subtle lightness differences). "
+            "Each pair is also flagged for whether lightness also fails to separate it (severity), so you can judge the risk level instead of relying on a single binary verdict. "
+            f"Severe: the full CIELAB distance (including lightness) is < {threshold_full_lab}. Moderate: the chroma (a*b*) distance is < {threshold_ab}, but the full CIELAB distance (including lightness) is >= {threshold_full_lab}."
         ),
     }
 
@@ -700,7 +700,7 @@ def _evaluate_colorblind_accessibility(
             "total_pairs_tested": 0,
             "threshold_used": confusability_threshold,
             "compliant": True,
-            "note": "未提供足夠萃取色盤（少於2色），略過兩兩比對"
+            "note": "Not enough extracted palette colors (fewer than 2); pairwise comparison skipped"
         }
 
     overall_compliant = global_compliant and pairwise_result["compliant"]
@@ -712,7 +712,7 @@ def _evaluate_colorblind_accessibility(
         "pairwise_confusability": pairwise_result,
         "compliant": overall_compliant,
         "saved_simulated_files": output_files,
-        "warning": "請搭配視覺輔助（如數據點符號、虛線或文字標籤）以確保符合 WCAG 1.4.1。",
+        "warning": "Use additional visual cues (such as marker shapes, dashed lines, or text labels) to ensure compliance with WCAG 1.4.1.",
     }
 
 
@@ -720,7 +720,7 @@ def evaluate_png_wcag21(image_path: str) -> Dict[str, Any]:
     """Run a full WCAG 2.1 assessment on a single image."""
     img_bgr = cv2.imread(image_path)
     if img_bgr is None:
-        raise ValueError(f"無法讀取圖片：{image_path}")
+        raise ValueError(f"Cannot read image: {image_path}")
 
     text_eval = _evaluate_text_contrast(img_bgr)
     non_text_eval = _evaluate_non_text_contrast(img_bgr, image_path)
@@ -832,7 +832,7 @@ def figure_compliance_checker(
 def generate_figure_report(data: Dict[str, Any]) -> str:
     """Convert the dict returned by figure_compliance_checker into a Markdown report."""
     if "error" in data:
-        return f"# ⚠️ 物理檢測失敗\n\n錯誤原因：{data['error']}\n"
+        return f"# ⚠️ Physical check failed\n\nError: {data['error']}\n"
 
     scale = data.get("scale_resolution", {})
     text_list = data.get("text_analysis", [])
@@ -855,16 +855,16 @@ def generate_figure_report(data: Dict[str, Any]) -> str:
         return "—"
 
     md = []
-    md.append("# 📊 學術圖表客觀物理與 WCAG 合規性檢測報告\n")
-    md.append("> *註：大多數數據為圖像演算法估算值，請注意與真實邊界的細微差異。*\n")
+    md.append("# 📊 Objective Physical and WCAG Compliance Report for Scientific Figures\n")
+    md.append("> *Note: most values are estimates from image-processing algorithms and may differ slightly from the true boundaries.*\n")
     md.append(
-        "> *文字大小與線寬僅提供量測數據，不做 PASS/FAIL 判定"
-        "（多數期刊未統一規定，請自行依投稿規範確認）；DPI 因普遍為硬性規定，"
-        "仍提供明確判定。*\n"
+        "> *Text size and line width are reported as measurements only, with no PASS/FAIL verdict"
+        " (most journals have no uniform rule; please check the submission guidelines). DPI is a near-universal hard requirement,"
+        " so it still receives an explicit verdict.*\n"
     )
 
-    md.append("## 1. 物理屬性總覽 (Executive Summary)\n")
-    md.append("| 檢測項目 | 測量 / 檢測結果 | 參考標準 | 判定 (Status) | 備註 |")
+    md.append("## 1. Physical Properties Overview (Executive Summary)\n")
+    md.append("| Check | Measurement / Result | Reference Standard | Status | Notes |")
     md.append("| :--- | :--- | :--- | :--- | :--- |")
 
     w_px = scale.get("width_px", "N/A")
@@ -872,46 +872,46 @@ def generate_figure_report(data: Dict[str, Any]) -> str:
     w_mm = scale.get("figure_width_mm", 85.0)
     col_type = scale.get("single_or_double_column", "single").capitalize()
     md.append(
-        f"| **圖表尺寸 (Scale)** | {w_px} × {h_px} px (印刷寬度 {w_mm} mm) |"
+        f"| **Figure Size (Scale)** | {w_px} × {h_px} px (print width {w_mm} mm) |"
         f" {col_type} ({w_mm} mm) | — | — |"
     )
 
     eff_dpi = round(float(scale.get("effective_dpi", 0)), 2)
     md.append(
-        f"| **有效解析度 (Effective DPI)** | **{eff_dpi} DPI** | ≥ 300 DPI（普遍硬性規定） |"
-        f" {fmt_status(pass_status.get('dpi_pass'))} | inch 跟 mm 轉換會有誤差 |"
+        f"| **Effective Resolution (Effective DPI)** | **{eff_dpi} DPI** | ≥ 300 DPI (near-universal hard requirement) |"
+        f" {fmt_status(pass_status.get('dpi_pass'))} | inch-to-mm conversion introduces some error |"
     )
 
     min_pt = text_report.get("min_pt", "N/A")
     avg_pt = text_report.get("avg_pt", "N/A")
     ge_ratio = text_report.get("ge_reference_pt_ratio", "N/A")
     md.append(
-        f"| **文字大小 (Text Size)** | 最小 **{min_pt} pt** / 平均 **{avg_pt} pt** /"
-        f" ≥8pt 比例 **{ge_ratio}%** | 依投稿期刊而異 | *僅供參考，請自行判斷* |"
-        " 多數期刊未統一規定最小字級 |"
+        f"| **Text Size** | min **{min_pt} pt** / avg **{avg_pt} pt** /"
+        f" ≥8pt ratio **{ge_ratio}%** | Varies by journal | *For reference only; use your own judgment* |"
+        " Most journals set no uniform minimum font size |"
     )
     med_line = line_report.get("median_width_pt", "N/A")
     est_line = line_report.get("estimated_true_line_pt", "N/A")
     md.append(
-        f"| **線條粗細 (Line Width)** | 估計 **{med_line} pt**（50百分位），**{est_line} pt**（75百分位） | 依投稿期刊而異 |"
-        " *僅供參考，請自行判斷* | 多數期刊未統一規定最小線寬 |"
+        f"| **Line Width** | estimated **{med_line} pt** (50th percentile), **{est_line} pt** (75th percentile) | Varies by journal |"
+        " *For reference only; use your own judgment* | Most journals set no uniform minimum line width |"
     )
 
     t_pass = text_wcag_details.get("passed_aa_count", 0)
     t_total = text_wcag_details.get("valid_texts_evaluated", 0)
     t_rate = round(text_wcag_details.get("pass_rate", 0) * 100, 1)
     md.append(
-        f"| **文字 WCAG 對比度 (1.4.3)** | 通過率 **{t_rate}%** ({t_pass}/{t_total} 項) |"
+        f"| **Text WCAG Contrast (1.4.3)** | pass rate **{t_rate}%** ({t_pass}/{t_total} items) |"
         f" ≥ 4.5:1 | {fmt_status(criteria_summary.get('1.4.3_text_contrast_min_4.5_to_1'))} |"
-        " 文字與背景顏色的對比度 |"
+        " Contrast between text and background colors |"
     )
 
     nt_pass = non_text_wcag_details.get("passed_3_to_1_count", 0)
     nt_total = non_text_wcag_details.get("non_bg_colors_count", 0)
     md.append(
-        f"| **圖形 WCAG 對比度 (1.4.11)** | 通過率 **{nt_pass}/{nt_total}** 種調色盤顏色 |"
+        f"| **Graphics WCAG Contrast (1.4.11)** | pass rate **{nt_pass}/{nt_total}** palette colors |"
         f" ≥ 3.0:1 | {fmt_status(criteria_summary.get('1.4.11_non_text_contrast_min_3.0_to_1'))} |"
-        " 非文字與背景顏色對比度 |"
+        " Contrast between non-text elements and background colors |"
     )
 
     max_loss = round(float(cb_details.get("max_information_loss_ratio", 0)) * 100, 1)
@@ -921,16 +921,16 @@ def generate_figure_report(data: Dict[str, Any]) -> str:
     n_unconfusable = len(pairwise.get("unconfusable_pairs", []))
     n_preconfusable = len(pairwise.get("pre_existing_low_contrast_pairs",[]))
     md.append(
-        f"| **色盲友善度 (1.4.1)** | 全域資訊損失 **{max_loss}%**"
-        f"（{'PASS' if global_ok else 'FAIL'}）／ 兩兩混淆對 **{n_confusable} 組** |"
-        f" 損失率 < 15% 且無混淆色對 | {fmt_status(criteria_summary.get('1.4.1_use_of_color_colorblind_safe'))} |"
-        " 兩兩混淆度可捕捉全域統計量漏掉的紅綠混淆問題 |\n"
+        f"| **Colorblind Friendliness (1.4.1)** | global information loss **{max_loss}%**"
+        f" ({'PASS' if global_ok else 'FAIL'}) / pairwise confusable pairs **{n_confusable}** |"
+        f" Loss rate < 15% and no confusable pairs | {fmt_status(criteria_summary.get('1.4.1_use_of_color_colorblind_safe'))} |"
+        " Pairwise confusability catches red-green confusion that global statistics miss |\n"
     )
     md.append(f"> *{cb_details.get('warning', '')}*\n")
 
     # ── Text recognition details ──────────────────────────────────────
-    md.append("## 2. 文字辨識與對比度明細 (Top 10)\n")
-    md.append("| 辨識文字 | 高度 (px) | 估算磅數 (pt) | 對比度 | WCAG對比 (≥4.5:1) |")
+    md.append("## 2. Text Recognition and Contrast Details (Top 10)\n")
+    md.append("| Recognized Text | Height (px) | Estimated Size (pt) | Contrast | WCAG Contrast (≥4.5:1) |")
     md.append("| :--- | :--- | :--- | :--- | :--- |")
 
     wcag_details_map = {d.get("text"): d for d in text_wcag_details.get("details", [])}
@@ -947,10 +947,10 @@ def generate_figure_report(data: Dict[str, Any]) -> str:
             f"| `{txt}` | {h_px_val} px | **{est_pt} pt** | {ratio} : 1 | {fmt_status(contrast_pass)} |"
         )
     # ── Palette and colorblind-friendliness analysis ──────────────────
-    md.append("## 3. 調色盤對比度分析\n")
+    md.append("## 3. Palette Contrast Analysis\n")
     bg_rgb = non_text_wcag_details.get("detected_background_rgb", [255, 255, 255])
-    md.append(f"**偵測背景色**：`RGB{tuple(bg_rgb)}` | **非文字物件 WCAG 門檻**：`3.0:1`\n")
-    md.append("| 色塊預覽 | 顏色 RGB | 佔比 | 對比度 (Ratio) | WCAG 3.0:1 門檻 |")
+    md.append(f"**Detected background color**: `RGB{tuple(bg_rgb)}` | **WCAG threshold for non-text objects**: `3.0:1`\n")
+    md.append("| Swatch | Color RGB | Share | Contrast (Ratio) | WCAG 3.0:1 Threshold |")
     md.append("| :---: | :--- | :--- | :--- | :--- |")
 
     for item in non_text_wcag_details.get("details", []):
@@ -966,18 +966,18 @@ def generate_figure_report(data: Dict[str, Any]) -> str:
     md.append("")
 
     loss_map = cb_details.get("loss_ratios_by_type", {})
-    md.append("**各類型色盲模擬全域資訊損失率**：")
+    md.append("**Global information loss rate by simulated colorblindness type**:")
     for deficiency, loss in loss_map.items():
         md.append(f"- **{deficiency}**: `{round(float(loss) * 100, 1)}%`")
     md.append("")
 
     # ── Pairwise colorblind confusability details ─────────────────────
-    md.append("## 4. 色盲兩兩混淆色對檢測 (Pairwise Confusability)\n")
+    md.append("## 4. Pairwise Colorblind Confusability Check (Pairwise Confusability)\n")
     total_tested = pairwise.get("total_pairs_tested", 0)
     thresh = pairwise.get("threshold_used",15)
     if n_preconfusable > 0:
-        md.append(f"⚠️ **檢測結果**：{(n_preconfusable)} 組色彩本身（未經色盲模擬）即已對比不足（門檻距離 < {thresh}）：\n")
-        md.append("| 色盲類型 | 顏色 1 (RGB) | 顏色 2 (RGB) | 模擬前距離 | 去除明度後比對距離 | Note |")
+        md.append(f"⚠️ **Result**: {(n_preconfusable)} color pairs already have insufficient contrast in the original colors, without colorblind simulation (threshold distance < {thresh}):\n")
+        md.append("| Colorblind Type | Color 1 (RGB) | Color 2 (RGB) | Distance Before Simulation | Full CIELAB Distance (incl. Lightness) | Note |")
         md.append("| :--- | :--- | :--- | :--- |:--- |:--- |")
         for pre_pair in pairwise["pre_existing_low_contrast_pairs"]:
             md.append(
@@ -987,8 +987,8 @@ def generate_figure_report(data: Dict[str, Any]) -> str:
         md.append("")
 
     if n_confusable > 0:
-        md.append(f"⚠️ **檢測結果**：已比對 **{total_tested} 組**色彩組合，發現 **{n_confusable} 組**色盲混淆色對（門檻距離 < {thresh}）：\n")
-        md.append("| 色盲類型 | 顏色 1 (RGB) | 顏色 2 (RGB) | 模擬後距離 | 去除明度後比對距離 | Note |")
+        md.append(f"⚠️ **Result**: compared **{total_tested}** color combinations and found **{n_confusable}** colorblind-confusable pairs (threshold distance < {thresh}):\n")
+        md.append("| Colorblind Type | Color 1 (RGB) | Color 2 (RGB) | Distance After Simulation | Full CIELAB Distance (incl. Lightness) | Note |")
         md.append("| :--- | :--- | :--- | :--- |:--- |:--- |")
         for pair in pairwise["confusable_pairs"]:
             md.append(
@@ -996,8 +996,8 @@ def generate_figure_report(data: Dict[str, Any]) -> str:
                 f" `RGB{tuple(pair['color_2_rgb'])}` | **{pair['simulated_ab_distance']}** |**{pair['simulated_full_lab_distance']}** |**{pair['severity']}** |"
             )
         md.append("")
-        md.append(f"其餘通過門檻的色對 **{n_unconfusable} 組**（門檻距離 < {thresh}）：\n")
-        md.append("| 色盲類型 | 顏色 1 (RGB) | 顏色 2 (RGB) | 模擬後距離 | 去除明度後比對距離 | Note |")
+        md.append(f"Remaining pairs that passed the threshold: **{n_unconfusable}** (threshold distance < {thresh}):\n")
+        md.append("| Colorblind Type | Color 1 (RGB) | Color 2 (RGB) | Distance After Simulation | Full CIELAB Distance (incl. Lightness) | Note |")
         md.append("| :--- | :--- | :--- | :--- |:--- |:--- |")
         
         for unpair in pairwise["unconfusable_pairs"]:
@@ -1008,8 +1008,8 @@ def generate_figure_report(data: Dict[str, Any]) -> str:
         md.append("")
         md.append(f"> *{pairwise.get('note', '')}*\n")
     else:
-        md.append(f"🟢 **檢測結果**：已完成 **{total_tested} 組**顏色兩兩比對（門檻距離 < {thresh}），**通過檢測**，未發現易混淆色對。\n")
-        md.append("| 色盲類型 | 顏色 1 (RGB) | 顏色 2 (RGB) | 模擬後距離 | 去除明度後比對距離 | Note |")
+        md.append(f"🟢 **Result**: completed **{total_tested}** pairwise color comparisons (threshold distance < {thresh}); **check passed**, no confusable pairs found.\n")
+        md.append("| Colorblind Type | Color 1 (RGB) | Color 2 (RGB) | Distance After Simulation | Full CIELAB Distance (incl. Lightness) | Note |")
         md.append("| :--- | :--- | :--- | :--- |:--- |:--- |")
         
         for unpair in pairwise["unconfusable_pairs"]:

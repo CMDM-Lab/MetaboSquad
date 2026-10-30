@@ -74,7 +74,7 @@ You must strictly adhere to the following mapping rules for task names (intent):
 - Criteria: The user wants to find background literature for a specific "scientific question", "field", or "multiple keywords".
 -Keyword Examples: look up literature, find information, related research, search, relationship between A and B.
 - Example: {"intent": "literature_search", "query": "Relationship between benzoic acid and lung cancer"}
-- Example: {"intent": "literature_search", "query": "請你幫我搜尋重金屬與癌症發生的相關性文獻"}
+- Example: {"intent": "literature_search", "query": "Please search for literature on the association between heavy metals and cancer incidence"}
 
 "analysis":
 - Criteria: The user mentions "data analysis, peak table, CSV analysis, statistical analysis" AND provides a file path.
@@ -88,7 +88,7 @@ You must strictly adhere to the following mapping rules for task names (intent):
 "direct":
 - Criteria: General conversation, small talk, greetings, or anything that does not belong to the above categories, or simply asking about capabilities.
 
-【Notes】
+[Notes]
 - All tasks must be wrapped inside a tasks list.
 - For the query field, please "completely copy" the user's original input related to that task. Do not omit any IDs, digits, or words, as subsequent nodes require this information for precise parsing.
 
@@ -129,7 +129,7 @@ def input_verifier_node(state: MainState) -> dict:
     if files and not has_file_mention:
         file_str = ", ".join(files)
         updated_query = (
-            f"{last_user_msg}\n(系統自動補充上傳檔案路徑: {file_str})"
+            f"{last_user_msg}\n(Uploaded file paths added automatically by the system: {file_str})"
         )
 
     return {
@@ -149,8 +149,10 @@ def _correct_misclassification(task: dict, files: list = None) -> dict:
 
     # Correction case 1: a single-metabolite lookup misclassified as a literature search
     # When intent is literature_search but the query contains common metabolite-attribute keywords and no literature keywords
-    metabolite_keywords = ["詳細資料", "pubchem", "cas", "cid", "結構", "代謝物資訊"]
-    lit_keywords = ["論文", "文獻", "研究", "paper", "journal", "幾篇", "相關性"]
+    metabolite_keywords = ["詳細資料", "pubchem", "cas", "cid", "結構", "代謝物資訊",
+                           "details", "structure", "metabolite information", "metabolite info"]
+    lit_keywords = ["論文", "文獻", "研究", "paper", "journal", "幾篇", "相關性",
+                    "literature", "research", "study", "studies", "article", "association", "correlation"]
 
     if intent == "literature_search":
         has_meta_kw = any(kw in query for kw in metabolite_keywords)
@@ -226,7 +228,7 @@ def supervisor_router(state: MainState):
 # inspect.getsource, which also matched comments and the docstring, so "small talk"
 # appearing in explanatory text was misread as "the prompt still invites small talk".
 DIRECT_RESPONSE_SYSTEM = (
-    "You are a Metabolomics Research Assistant. Please respond to the user's questions in Traditional Chinese or English.\n"
+    "You are a Metabolomics Research Assistant. Please respond to the user's questions in English.\n"
     "\n"
     "## Scope (strict)\n"
     "You only help with:\n"
@@ -291,10 +293,10 @@ def execute_single_task(state: MainState, config: RunnableConfig) -> dict:
         result = wrapper_map.get(intent, direct_response_node)(patched, config)
         ai_msg = next(
             (m for m in reversed(result.get("messages", [])) if isinstance(m, AIMessage)),
-            AIMessage(content="（無結果）")
+            AIMessage(content="(no result)")
         )
     except Exception as e:
-        ai_msg = AIMessage(content=f"（{intent} 執行失敗：{e}）")
+        ai_msg = AIMessage(content=f"({intent} failed: {e})")
 
     return {"task_results": [{"intent": intent, "query": query, "message": ai_msg}]}
 
@@ -303,7 +305,7 @@ def synthesize_node(state: MainState) -> dict:
     """Merge the results of all tasks into one fluent reply"""
     results  = state.get("task_results", [])
     combined = "\n\n".join(
-        f"【{r['intent']}｜{r['query']}】\n{r['message'].content}"
+        f"[{r['intent']} | {r['query']}]\n{r['message'].content}"
         for r in results
     )
     resp = llm.invoke([

@@ -65,7 +65,7 @@ def test_absolute_peak_table_path_is_not_mangled(abs_peak_table):
     """
     result = _unwrap(mummichog_analysis)(str(abs_peak_table))
     assert isinstance(result, dict), f"回傳的是 str：{result!r}"
-    assert "找不到檔案" not in result.get("error", ""), (
+    assert "file not found" not in result.get("error", ""), (
         f"絕對路徑被破壞了，檔案明明存在卻說找不到：{result!r}"
     )
 

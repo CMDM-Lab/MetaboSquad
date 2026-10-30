@@ -34,7 +34,7 @@ IMAGE_DIR.mkdir(parents=True, exist_ok=True)
 async def upload_csv(file: UploadFile = File(...)):
     # 1. Check the file format (optional, for extra safety)
     if not file.filename.endswith('.csv'):
-        raise HTTPException(status_code=400, detail="只允許上傳 CSV 檔案")
+        raise HTTPException(status_code=400, detail="Only CSV files can be uploaded")
 
     # 2. Sanitise the filename: prevent path traversal
     safe_filename = os.path.basename(file.filename) 
@@ -45,13 +45,13 @@ async def upload_csv(file: UploadFile = File(...)):
         with save_path.open("wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"檔案儲存失敗: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to save the file: {str(e)}")
     finally:
         await file.close() # Close the file
     
     # 4. Return data matching the UploadPublic definition
     return {
-        "message": f"成功上傳檔案：{safe_filename}",
+        "message": f"File uploaded: {safe_filename}",
         "file_path": f"/uploads/csv/{safe_filename}"
     }
 
@@ -65,7 +65,7 @@ async def upload_image(file: UploadFile = File(...)):
     if file_ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=400, 
-            detail=f"不支援的檔案格式。僅允許: {', '.join(ALLOWED_EXTENSIONS)}"
+            detail=f"Unsupported file format. Allowed formats: {', '.join(ALLOWED_EXTENSIONS)}"
         )
 
     # 2. Sanitise the filename
@@ -77,13 +77,13 @@ async def upload_image(file: UploadFile = File(...)):
         with save_path.open("wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"圖片儲存失敗: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to save the image: {str(e)}")
     finally:
         await file.close()
 
     # 4. Return the formatted data
     return {
-        "message": f"成功上傳圖片：{safe_filename}",
+        "message": f"Image uploaded: {safe_filename}",
         # Matches the actual mount path and folder naming: uploads/image/...
         "file_path": f"/uploads/image/{safe_filename}",
     }
@@ -138,11 +138,11 @@ async def download_analysis_zip(req: ZipRequest):
     # 2. Make sure it can only operate inside the project's uploads folder
     uploads_absolute_path = os.path.abspath(os.path.join(BASE_DIR, "uploads"))
     if not target_folder_path.startswith(uploads_absolute_path):
-        raise HTTPException(status_code=400, detail="不合法的下載路徑偏離")
+        raise HTTPException(status_code=400, detail="Invalid download path: outside the uploads folder")
 
     # 3. Check that the physical folder actually exists
     if not os.path.exists(target_folder_path):
-        raise HTTPException(status_code=404, detail=f"後端找不到實體資料夾，預期路徑為: {target_folder_path}")
+        raise HTTPException(status_code=404, detail=f"Folder not found on the server. Expected path: {target_folder_path}")
         
     # 4. Parse the date to decide the zip's absolute path
     date_str = target_folder_path.replace("\\", "/").split("/")[-1] 
@@ -157,7 +157,7 @@ async def download_analysis_zip(req: ZipRequest):
         _write_zip_with_redacted_text(Path(target_folder_path),
                                       Path(f"{zip_output_base}.zip"))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"壓縮檔案失敗: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to create the ZIP file: {str(e)}")
         
     # 6. Return the download URL to the frontend (matches app.mount("/uploads", ...) in main.py)
     return {

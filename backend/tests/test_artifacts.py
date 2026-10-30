@@ -141,7 +141,7 @@ def test_markdown_does_not_leak_the_server_filesystem_path(client, session):
     leaked = f"{UPLOAD_ROOT}/output/analysis/lcms_table_20260812_152604"
     out = _read_markdown(
         client, "DRRD1", "redact-1",
-        f"* **Mummichog Result**: Mummichog 完成！結果已存至 {leaked}",
+        f"* **Mummichog Result**: Mummichog completed. Results saved to {leaked}",
     )
 
     assert str(BASE_DIR) not in out

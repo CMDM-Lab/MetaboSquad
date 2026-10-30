@@ -80,7 +80,7 @@ def resolve_uploads_path(rel: str) -> Path:
         # Still starting with / after stripping the recognised /uploads/ prefix = the caller gave an
         # absolute filesystem path. Never silently reinterpret it as relative (that would turn "/etc/passwd"
         # into UPLOAD_ROOT/etc/passwd and pass the commonpath check); always reject.
-        raise ValueError(f"路徑越界：{rel}")
+        raise ValueError(f"Path outside the allowed root: {rel}")
 
     candidate = (UPLOAD_ROOT / cleaned).resolve()
 
@@ -88,17 +88,17 @@ def resolve_uploads_path(rel: str) -> Path:
         common = os.path.commonpath([str(UPLOAD_ROOT), str(candidate)])
     except ValueError:
         # Different drives (Windows)
-        raise ValueError(f"路徑越界：{rel}")
+        raise ValueError(f"Path outside the allowed root: {rel}")
 
     if common != str(UPLOAD_ROOT):
-        raise ValueError(f"路徑越界：{rel}")
+        raise ValueError(f"Path outside the allowed root: {rel}")
 
     if candidate == UPLOAD_ROOT:
         # The resolved path equals the root itself ("", ".", "/uploads/", "output/..", etc.) =
         # a request to enumerate the whole uploads tree, including every user's analysis output and markdown.
         # This function's contract is to resolve paths *under* UPLOAD_ROOT; the root itself is outside
         # the contract, so always reject (rather than leaving list_folder to filter afterwards).
-        raise ValueError(f"路徑越界：{rel}")
+        raise ValueError(f"Path outside the allowed root: {rel}")
 
     return candidate
 

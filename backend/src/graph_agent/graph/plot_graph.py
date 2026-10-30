@@ -80,7 +80,7 @@ Modifications & Recommendations (Max 3 items):
 1. <Action 1>
 2. <Action 2>
 3. <Action 3>
-Please respond in Traditional Chinese (繁體中文).
+Please respond in English.
 """
 
 def _load_image_as_base64(path: str) -> str:
@@ -97,11 +97,11 @@ def _process_single_file(fpath: str, query: str) -> dict[str, any]:
     try:
         compliance_res = figure_compliance_checker.invoke({"path": fpath})
     except Exception as e:
-        compliance_res = {"error": f"物理檢測失敗: {str(e)}"}
+        compliance_res = {"error": f"Physical check failed: {str(e)}"}
 
     suffix = Path(fpath).suffix.lower()
     warning = (
-        "JPG 的有損壓縮可能引入邊緣模糊影響偵測精確度" if suffix != ".png" else ""
+        "Lossy JPG compression may blur edges and reduce detection accuracy" if suffix != ".png" else ""
     )
 
     mime = {
@@ -139,7 +139,7 @@ def plot_review_node(state: PlotReviewState, config: RunnableConfig) -> dict:
         writer({"status": "Plot review is in progress..."})
 
     files = state.get("files", [])
-    query = state.get("original_query", "請審查此圖表")
+    query = state.get("original_query", "Please review this figure")
 
     if not files:
         return {
@@ -177,12 +177,12 @@ def plot_review_node(state: PlotReviewState, config: RunnableConfig) -> dict:
                 review_results_map[idx] = {
                     "file_path": fpath,
                     "file_name": file_name,
-                    "feedback": f"審查失敗，錯誤原因：{str(e)}",
+                    "feedback": f"Review failed. Error: {str(e)}",
                 }
                 compliance_results_map[idx] = {
                     "file_path": fpath,
                     "file_name": file_name,
-                    "error": f"檢測失敗：{str(e)}",
+                    "error": f"Check failed: {str(e)}",
                 }
 
     review_results = [
@@ -193,7 +193,7 @@ def plot_review_node(state: PlotReviewState, config: RunnableConfig) -> dict:
         for idx in sorted(compliance_results_map.keys())
     ]
 
-    summary_msg = f"已完成 {len(review_results)} 張圖片的物理合規性檢測與 Vision LLM 審查。"
+    summary_msg = f"Completed the physical compliance check and Vision LLM review for {len(review_results)} images."
 
     return {
         "messages": [AIMessage(content=summary_msg)],
@@ -221,7 +221,7 @@ def write_plot_output_node(
     for idx, item in enumerate(review_results):
         file_name = item.get("file_name", f"image_{idx+1}")
         stem_name = Path(file_name).stem
-        feedback = item.get("feedback", "無建議內容")
+        feedback = item.get("feedback", "No recommendations")
 
         comp_data = (
             compliance_checks[idx] if idx < len(compliance_checks) else {}
@@ -230,20 +230,20 @@ def write_plot_output_node(
 
         file_path = f"{folder_path}/result_{stem_name}_{date}.md"
 
-        content = f"""# 圖片審查報告 - {file_name}
+        content = f"""# Figure Review Report - {file_name}
 
-**產生時間**：{date}
-**圖片檔名**：{file_name}
-**原始研究問題**：{state.get('original_query', 'N/A')}
+**Generated at**: {date}
+**Image file name**: {file_name}
+**Original research question**: {state.get('original_query', 'N/A')}
 
 ---
 
-## I. LLM 視覺語意與排版審查建議
+## I. LLM Visual Semantics and Layout Review Recommendations
 {feedback}
 
 ---
 
-## II. OpenCV / OCR 物理與 WCAG 客觀檢測報告
+## II. OpenCV / OCR Objective Physical and WCAG Check Report
 {formatted_tool_report}
 """
         with open(file_path, "w", encoding="utf-8") as f:
@@ -265,8 +265,8 @@ def write_plot_output_node(
         "messages": [
             AIMessage(
                 content=(
-                    "所有查詢報告已成功儲存至"
-                    f" `{folder_path}` 資料夾：\n{path_summary}"
+                    "All reports were saved to the"
+                    f" `{folder_path}` folder:\n{path_summary}"
                 )
             )
         ],

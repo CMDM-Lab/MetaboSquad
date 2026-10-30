@@ -332,7 +332,7 @@ def test_db_write_failure_emits_error_event_not_saved(session):
     assert not any(name == "saved" for name, _ in events)
     error_events = [d for name, d in events if name == "error"]
     assert len(error_events) == 1
-    assert "回覆儲存失敗" in error_events[0]["content"]
+    assert "Failed to save the reply" in error_events[0]["content"]
 
     # The session must remain usable after the failed commit and rollback: the existing
     # user message is still there, and no assistant row was accidentally left behind.

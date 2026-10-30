@@ -82,8 +82,8 @@ def test_unparseable_verdict_is_absent_not_defaulted():
 
 
 def test_measurement_failure_is_recorded_and_yields_no_quantities():
-    p = parse_review_entry(_entry(compliance_result={"error": "物理檢測失敗: bad png"}))
-    assert p["compliance_error"].startswith("物理檢測失敗")
+    p = parse_review_entry(_entry(compliance_result={"error": "Physical check failed: bad png"}))
+    assert p["compliance_error"].startswith("Physical check failed")
     for k in ("font_size_pt", "line_width_pt", "resolution_violation"):
         assert k not in p
 

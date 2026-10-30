@@ -93,7 +93,7 @@ def write_file(path: str, content: str) -> str:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
-    return f"檔案已儲存至 {path}"
+    return f"File saved to {path}"
 
 
 @tool
@@ -103,7 +103,7 @@ def edit_file(path: str, append_content: str) -> str:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "a", encoding="utf-8") as f:
         f.write("\n" + append_content)
-    return f"✅ 內容已追加至 {path}"
+    return f"✅ Content appended to {path}"
 
 @tool
 def read_file(path: str, content: str) -> str:
@@ -112,7 +112,7 @@ def read_file(path: str, content: str) -> str:
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
-    return f"✅ 檔案已儲存至 {path}"
+    return f"✅ File saved to {path}"
 
 # ════════════════════════════════════════════════════════════════════════════
 # Tool list (for convenient import by other modules)
