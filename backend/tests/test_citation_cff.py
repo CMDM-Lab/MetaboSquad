@@ -41,3 +41,13 @@ def test_license_matches_license_file():
 
 def test_repository_url():
     assert _cff()["repository-code"] == REPO_URL
+
+
+# Zenodo DOI of each released version. A new release gets a new DOI, so a version bump
+# without a matching entry here goes red instead of citing the previous archive.
+ZENODO_VERSION_DOI = {"0.1.0": "10.5281/zenodo.23801001"}
+
+
+def test_doi_matches_zenodo_record_of_version():
+    cff = _cff()
+    assert cff.get("doi") == ZENODO_VERSION_DOI.get(str(cff["version"]))
